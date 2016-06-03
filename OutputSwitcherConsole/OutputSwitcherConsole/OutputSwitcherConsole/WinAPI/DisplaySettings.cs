@@ -9,8 +9,14 @@ namespace OutputSwitcherConsole.WinAPI
 {
     class DisplaySettings
     {
-        static public int ENUM_CURRENT_SETTINGS = -1;
-        static public int ENUM_REGISTRY_SETTINGS = 0;
+        static public readonly int ENUM_CURRENT_SETTINGS = -1;
+        static public readonly int ENUM_REGISTRY_SETTINGS = 0;
+
+        // DEVMODE.dmDisplayOrientation constants.
+        static public readonly Int32 DMDO_DEFAULT = 0;
+        static public readonly Int32 DMDO_90 = 1;
+        static public readonly Int32 DMDO_180 = 2;
+        static public readonly Int32 DMDO_270 = 3;
 
         [DllImport("user32.dll")]
         static extern public bool EnumDisplayDevices(
@@ -26,27 +32,33 @@ namespace OutputSwitcherConsole.WinAPI
             ref DEVMODE lpDevMode,
             uint dwFlags);
 
-        static public void WriteDisplayDeviceToConsole(DISPLAY_DEVICE displayDevice, uint devNum)
+        [DllImport("user32.dll")]
+        static extern public DISP_CHANGE ChangeDisplaySettingsEx(
+            string lpszDeviceName,
+            ref DEVMODE lpDevMode,
+            IntPtr hwnd,
+            ChangeDisplaySettingsFlags dwflags,
+            IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        static extern public DISP_CHANGE ChangeDisplaySettingsEx(
+            IntPtr lpszDeviceName,
+            IntPtr lpDevMode,
+            IntPtr hwnd,
+            ChangeDisplaySettingsFlags dwflags,
+            IntPtr lParam);
+
+        static public bool IsDisplayPrimary(DEVMODE devMode)
         {
-            Console.WriteLine("Device #: " + devNum);
-            Console.WriteLine("Device Name: " + displayDevice.DeviceName);
-            Console.WriteLine("Device String: " + displayDevice.DeviceString);
-            Console.WriteLine("Device ID: " + displayDevice.DeviceID);
-            Console.WriteLine("Attached to Desktop? " + ((displayDevice.StateFlags & DisplayDeviceStateFlags.AttachedToDesktop) > 0 ? "Yes" : "No"));
-            Console.WriteLine("Primary Device? " + ((displayDevice.StateFlags & DisplayDeviceStateFlags.PrimaryDevice) > 0 ? "Yes" : "No"));
-            Console.WriteLine("Removable? " + ((displayDevice.StateFlags & DisplayDeviceStateFlags.Removable) > 0 ? "Yes" : "No"));
-            Console.WriteLine();
+            return (devMode.dmPosition.x == 0 &&
+                    devMode.dmPosition.y == 0 &&
+                    devMode.dmPelsHeight != 0 &&
+                    devMode.dmPelsWidth != 0);
         }
 
-        static public void WriteDisplayDeviceSettingsToConsole(DEVMODE devMode, string deviceName)
+        static public bool IsDisplayAttachedToDesktop(DEVMODE devMode)
         {
-            Console.WriteLine("Device Name: " + deviceName);
-            Console.WriteLine("Friendly Name: " + devMode.dmDeviceName);
-            Console.WriteLine("PelsWidth: " + devMode.dmPelsWidth);
-            Console.WriteLine("PelsHeight: " + devMode.dmPelsHeight);
-            Console.WriteLine("Position X: " + devMode.dmPosition.x + ", Y: " + devMode.dmPosition.y);
-            Console.WriteLine("Is Primary: " + ((devMode.dmPosition.x == 0 && devMode.dmPosition.y == 0) ? "Yes" : "No"));
-            Console.WriteLine();
+            return (devMode.dmPelsHeight != 0 && devMode.dmPelsWidth != 0);
         }
     }
 }

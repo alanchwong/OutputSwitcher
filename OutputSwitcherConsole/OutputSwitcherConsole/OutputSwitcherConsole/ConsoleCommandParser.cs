@@ -13,7 +13,8 @@ namespace OutputSwitcherConsole
             Exit = 0,
             ShowDisplayDevicesToConsole = 1,
             ShowDisplayAdapterSettingsToConsole = 2,
-            Unknown = 3,
+            TestSwapPrimaryAndASecondaryDisplay = 3,
+            Unknown = 4,
         }
 
         static public void MainLoop()
@@ -25,6 +26,7 @@ namespace OutputSwitcherConsole
                 Console.WriteLine("Select action:");
                 Console.WriteLine("[1] Show all display devices.");
                 Console.WriteLine("[2] Show all display adapters' settings.");
+                Console.WriteLine("[3] (Test) Swap Primary and a Secondary display.");
                 Console.WriteLine("[0] Exit.");
                 Console.Write("\nAction: ");
 
@@ -39,6 +41,9 @@ namespace OutputSwitcherConsole
                         break;
                     case CommandAction.ShowDisplayAdapterSettingsToConsole:
                         ConsoleCommands.ShowDisplayAdapterDeviceSettings();
+                        break;
+                    case CommandAction.TestSwapPrimaryAndASecondaryDisplay:
+                        ConsoleCommands.TestSwapPrimaryAndASecondaryDisplay();
                         break;
                     default:
                         Console.WriteLine("Unknown action.");

@@ -184,4 +184,39 @@ namespace OutputSwitcherConsole.WinAPI
         Remote = 0x4000000,
         Disconnect = 0x2000000
     }
+
+    /// <summary>
+    /// Return value for ChangeDisplaySettingsEx.
+    /// </summary>
+    enum DISP_CHANGE : int
+    {
+        Successful = 0,
+        Restart = 1,
+        Failed = -1,
+        BadMode = -2,
+        NotUpdated = -3,
+        BadFlags = -4,
+        BadParam = -5,
+        BadDualView = -6
+    }
+
+    /// <summary>
+    /// Flags for dwFlags parameter in ChangeDisplaySettingsEx.
+    /// </summary>
+    [Flags()]
+    public enum ChangeDisplaySettingsFlags : uint
+    {
+        CDS_NONE = 0,
+        CDS_UPDATEREGISTRY = 0x00000001,
+        CDS_TEST = 0x00000002,
+        CDS_FULLSCREEN = 0x00000004,
+        CDS_GLOBAL = 0x00000008,
+        CDS_SET_PRIMARY = 0x00000010,
+        CDS_VIDEOPARAMETERS = 0x00000020,
+        CDS_ENABLE_UNSAFE_MODES = 0x00000100,
+        CDS_DISABLE_UNSAFE_MODES = 0x00000200,
+        CDS_RESET = 0x40000000,
+        CDS_RESET_EX = 0x20000000,
+        CDS_NORESET = 0x10000000
+    }
 }
