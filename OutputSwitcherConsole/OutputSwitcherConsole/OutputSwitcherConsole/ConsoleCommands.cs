@@ -189,12 +189,7 @@ namespace OutputSwitcherConsole
                 return;
             }
 
-            result = DisplaySettings.ChangeDisplaySettingsEx(
-                IntPtr.Zero,
-                IntPtr.Zero,
-                IntPtr.Zero,
-                0,
-                IntPtr.Zero);
+            result = DisplaySettings.ChangeDisplaySettingsEx(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero);
 
             if (result != DISP_CHANGE.Successful)
             {
@@ -236,17 +231,23 @@ namespace OutputSwitcherConsole
                 return;
             }
 
-            result = DisplaySettings.ChangeDisplaySettingsEx(
-                IntPtr.Zero,
-                IntPtr.Zero,
-                IntPtr.Zero,
-                0,
-                IntPtr.Zero);
+            result = DisplaySettings.ChangeDisplaySettingsEx(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero);
 
             if (result != DISP_CHANGE.Successful)
             {
                 Console.WriteLine("Failed to apply primary/secondary swap with value: " + result);
             }
+        }
+
+        static public void TestCaptureCurrentConfigurationAndWriteToFile()
+        {
+            DisplayPresetCollection presetCollection = DisplayPresetCollection.GetDisplayPresetCollection();
+
+            DisplayPreset currentConfigurationAsPreset = 
+                DisplayPresetRecorderAndApplier.RecordCurrentConfiguration("Alpha One");
+
+            presetCollection.TryAddDisplayPreset(currentConfigurationAsPreset);
+            presetCollection.PersistDisplayPresets();
         }
     }
 }

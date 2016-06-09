@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace OutputSwitcherConsole.WinAPI
 {
-    enum DM : int
+    public enum DM : int
     {
         Orientation = 0x1,
         PaperSize = 0x2,
@@ -41,7 +41,7 @@ namespace OutputSwitcherConsole.WinAPI
         DisplayFixedOutput = 0x20000000
     }
 
-    struct POINTL
+    public struct POINTL
     {
         public Int32 x;
         public Int32 y;
@@ -50,7 +50,7 @@ namespace OutputSwitcherConsole.WinAPI
     /// <summary>
     /// Specifies whether collation should be used when printing multiple copies.
     /// </summary>
-    internal enum DMCOLLATE : short
+    public enum DMCOLLATE : short
     {
         /// <summary>
         /// Do not collate when printing multiple copies.
@@ -66,7 +66,7 @@ namespace OutputSwitcherConsole.WinAPI
     /// <summary>
     /// Switches between color and monochrome on color printers.
     /// </summary>
-    internal enum DMCOLOR : short
+    public enum DMCOLOR : short
     {
         DMCOLOR_UNKNOWN = 0,
 
@@ -76,7 +76,7 @@ namespace OutputSwitcherConsole.WinAPI
     }
   
     [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Ansi)]
-    struct DEVMODE
+    public struct DEVMODE
     {
         public const int CCHDEVICENAME = 32;
         public const int CCHFORMNAME = 32;
@@ -188,7 +188,7 @@ namespace OutputSwitcherConsole.WinAPI
     /// <summary>
     /// Return value for ChangeDisplaySettingsEx.
     /// </summary>
-    enum DISP_CHANGE : int
+    public enum DISP_CHANGE : int
     {
         Successful = 0,
         Restart = 1,
@@ -218,5 +218,16 @@ namespace OutputSwitcherConsole.WinAPI
         CDS_RESET = 0x40000000,
         CDS_RESET_EX = 0x20000000,
         CDS_NORESET = 0x10000000
+    }
+
+    /// <summary>
+    /// Values for DEVMODE.dmDisplayOrientation.
+    /// </summary>
+    public enum DMDO : Int32
+    {
+        Default = 0,
+        Rotate90 = 1,
+        Rotate180 = 2,
+        Rotate270 = 3
     }
 }

@@ -12,12 +12,6 @@ namespace OutputSwitcherConsole.WinAPI
         static public readonly int ENUM_CURRENT_SETTINGS = -1;
         static public readonly int ENUM_REGISTRY_SETTINGS = 0;
 
-        // DEVMODE.dmDisplayOrientation constants.
-        static public readonly Int32 DMDO_DEFAULT = 0;
-        static public readonly Int32 DMDO_90 = 1;
-        static public readonly Int32 DMDO_180 = 2;
-        static public readonly Int32 DMDO_270 = 3;
-
         [DllImport("user32.dll")]
         static extern public bool EnumDisplayDevices(
             string lpDevice,
