@@ -70,20 +70,48 @@ namespace OutputSwitcherConsole.Data
         }
 
         /// <summary>
-        /// Retrieves an array containing all the display presets.
+        /// Retrieves a collection containing all the display presets.
         /// </summary>
-        /// <returns>An array of DisplayPreset objects.</returns>
+        /// <returns>A list of DisplayPreset objects.</returns>
         public List<DisplayPreset> GetPresets()
         {
             List<DisplayPreset> listOfPresets = new List<DisplayPreset>(mDisplayPresetDictionary.Values);
             return listOfPresets;
         }
 
+        /// <summary>
+        /// Retrieves the DisplayPreset with a specific name.
+        /// </summary>
+        /// <param name="name">Name of the preset.</param>
+        /// <returns>The DisplayPreset with the supplied name, null otherwise.</returns>
+        public DisplayPreset GetPreset(string name)
+        {
+            DisplayPreset requestedPreset = null;
+
+            if (mDisplayPresetDictionary.TryGetValue(name, out requestedPreset))
+                return requestedPreset;
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Constructor for the DisplayPresetCollection singleton. Initializes the
+        /// collection of presets with presets saved in the configuration file.
+        /// </summary>
         private DisplayPresetCollection()
         {
+            mDisplayPresetDictionary = new Dictionary<string, DisplayPreset>();
+
             // RAII baby, load it up
-            DisplayDeviceSettingsPersistence.LoadSettings();
-            mDisplayPresetDictionary = new Dictionary<string, DisplayPreset>(); // TODO: Place loaded items into this. Can we just write the dictionary as is?
+            List<DisplayPreset> displayPresets = DisplayDeviceSettingsPersistence.LoadSettings();
+
+            if (displayPresets != null)
+            {
+                foreach (DisplayPreset preset in displayPresets)
+                {
+                    mDisplayPresetDictionary.Add(preset.Name, preset);
+                }
+            }
         }
 
         private static DisplayPresetCollection mInstance = null;

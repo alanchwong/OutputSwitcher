@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace OutputSwitcherConsole.Data
 {
@@ -14,23 +16,33 @@ namespace OutputSwitcherConsole.Data
         
         private static readonly string DisplayConfigurationsFullFilename = DisplayConfigurationsFilePath + "\\DisplayConfigurations.xml";
 
-        public static void LoadSettings()
+        public static List<DisplayPreset> LoadSettings()
         {
+            List<DisplayPreset> displayPresets = null;
 
+            XmlSerializer reader = new XmlSerializer(typeof(List<DisplayPreset>));
+
+            if (File.Exists(DisplayConfigurationsFullFilename))
+            {
+                StreamReader presetsFile = new StreamReader(File.OpenRead(DisplayConfigurationsFullFilename));
+                displayPresets = (List<DisplayPreset>)reader.Deserialize(presetsFile);
+                presetsFile.Close();
+            }
+
+            return displayPresets;
         }
 
         public static void WriteSettings(List<DisplayPreset> presetCollection)
         {
-            System.Xml.Serialization.XmlSerializer writer
-                = new System.Xml.Serialization.XmlSerializer(typeof(List<DisplayPreset>));
+            XmlSerializer writer = new XmlSerializer(typeof(List<DisplayPreset>));
 
-            if (!System.IO.Directory.Exists(DisplayConfigurationsFilePath))
+            if (!Directory.Exists(DisplayConfigurationsFilePath))
             {
                 // This will throw exception if it fails.
-                System.IO.Directory.CreateDirectory(DisplayConfigurationsFilePath);
+                Directory.CreateDirectory(DisplayConfigurationsFilePath);
             }
 
-            System.IO.FileStream presetsFile = System.IO.File.Create(DisplayConfigurationsFullFilename);
+            FileStream presetsFile = File.Create(DisplayConfigurationsFullFilename);
 
             writer.Serialize(presetsFile, presetCollection);
             presetsFile.Close();

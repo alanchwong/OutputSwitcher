@@ -12,6 +12,16 @@ namespace OutputSwitcherConsole
     class ConsoleCommands
     {
         /// <summary>
+        /// Terminates the application with a return code of 0.
+        /// </summary>
+        static public void Exit()
+        {
+            DisplayPresetCollection.GetDisplayPresetCollection().PersistDisplayPresets();   // Write to disk before exiting.
+
+            Environment.Exit(0);
+        }
+
+        /// <summary>
         /// Enumerates all display adapters and attached display devices for each adapter and outputs 
         /// to console.
         /// </summary>
@@ -70,6 +80,25 @@ namespace OutputSwitcherConsole
 
                 ConsoleOutputUtilities.WriteDisplayDeviceSettingsToConsole(devMode, displayAdapterName);
 
+                uint innerDevNum = 0;
+
+                DISPLAY_DEVICE innerDisplayDevice = DisplaySettings.MakeNewDisplayDevice();
+
+                while (DisplaySettings.EnumDisplayDevices(displayAdapterName, innerDevNum, ref innerDisplayDevice, 0))
+                {
+                    DEVMODE innerDevMode = DisplaySettings.MakeNewDevmode();
+
+                    DisplaySettings.EnumDisplaySettingsEx(
+                        innerDisplayDevice.DeviceName,
+                        DisplaySettings.ENUM_CURRENT_SETTINGS,
+                        ref innerDevMode,
+                        0);
+
+                    ConsoleOutputUtilities.WriteDisplayDeviceSettingsToConsole(innerDevMode, innerDisplayDevice.DeviceName);
+
+                    innerDevNum++;
+                }
+
                 devNum++;
             }
         }
@@ -103,16 +132,24 @@ namespace OutputSwitcherConsole
                     ref devMode,
                     0))
                 {
+                    DISPLAY_DEVICE innerDisplayDevice = DisplaySettings.MakeNewDisplayDevice();
+
+                    DisplaySettings.EnumDisplayDevices(
+                        displayDevice.DeviceName,
+                        0,
+                        ref innerDisplayDevice,
+                        0);
+
                     if (DisplaySettings.IsDisplayPrimary(devMode))
                     {
                         primaryFound = true;
-                        originalPrimaryDeviceSettings = new DisplayDeviceSettings(displayDevice.DeviceName, devMode);
+                        originalPrimaryDeviceSettings = new DisplayDeviceSettings(displayDevice.DeviceName, innerDisplayDevice.DeviceID, devMode);
                         originalPrimarySettings = devMode;
                     }
                     else if (!secondaryFound && DisplaySettings.IsDisplayAttachedToDesktop(devMode))
                     {
                         secondaryFound = true;
-                        originalSecondaryDeviceSettings = new DisplayDeviceSettings(displayDevice.DeviceName, devMode);
+                        originalSecondaryDeviceSettings = new DisplayDeviceSettings(displayDevice.DeviceName, innerDisplayDevice.DeviceID, devMode);
                         originalSecondarySettings = devMode;
                     }
                 }
@@ -248,6 +285,131 @@ namespace OutputSwitcherConsole
 
             presetCollection.TryAddDisplayPreset(currentConfigurationAsPreset);
             presetCollection.PersistDisplayPresets();
+        }
+
+        static public void ListPresets()
+        {
+            DisplayPresetCollection presetCollection = DisplayPresetCollection.GetDisplayPresetCollection();
+
+            foreach (DisplayPreset displayPreset in presetCollection.GetPresets())
+            {
+                ConsoleOutputUtilities.WriteDisplayPresetToConsole(displayPreset);
+            }
+        }
+
+        static public void DeletePreset()
+        {
+            Console.Write("Enter name of preset to delete: ");
+            string targetPresetName = Console.ReadLine();
+
+            DisplayPresetCollection displayPresetCollection = DisplayPresetCollection.GetDisplayPresetCollection();
+            bool presetDeleted = displayPresetCollection.TryRemoveDisplayPreset(targetPresetName);
+
+            if (presetDeleted)
+            {
+                Console.WriteLine("Deleted preset '" + targetPresetName + "'.");
+            }
+            else
+            {
+                Console.WriteLine("Preset '" + targetPresetName + "' does not exist.");
+            }
+        }
+
+        static public void CaptureCurrentConfigAndSaveAsPreset()
+        {
+            bool uniqueNameEntered = false;
+
+            string presetName;
+
+            DisplayPresetCollection displayPresetCollection = DisplayPresetCollection.GetDisplayPresetCollection();
+
+            do
+            {
+                Console.Write("Enter name for new preset: ");
+                presetName = Console.ReadLine();
+
+                DisplayPreset existingDisplayPreset = displayPresetCollection.GetPreset(presetName);
+
+                uniqueNameEntered = existingDisplayPreset == null;
+
+                if (!uniqueNameEntered)
+                {
+                    Console.WriteLine("Preset with name '" + presetName + "' already exists. Please choose a different name.");
+                }
+
+            } while (!uniqueNameEntered);
+
+            DisplayPreset newPreset = DisplayPresetRecorderAndApplier.RecordCurrentConfiguration(presetName);
+
+            if (!displayPresetCollection.TryAddDisplayPreset(newPreset))
+            {
+                throw new Exception("Failed to add new preset to saved presets collection.");   // This is really unexpected because we've checked for existence already.
+            }
+
+            Console.WriteLine("Added new preset!");
+            ConsoleOutputUtilities.WriteDisplayPresetToConsole(newPreset);
+        }
+
+        static public void ApplyPreset()
+        {
+            Console.Write("Enter name of preset to apply: ");
+            string presetName = Console.ReadLine();
+
+            DisplayPresetCollection displayPresetCollection = DisplayPresetCollection.GetDisplayPresetCollection();
+
+            DisplayPreset targetPreset = displayPresetCollection.GetPreset(presetName);
+
+            if (targetPreset == null)
+            {
+                Console.WriteLine("Preset with name '" + presetName + "' does not exist.");
+                return;
+            }
+
+            Console.WriteLine("Applying preset '" + presetName + "'...");
+            DisplayPresetRecorderAndApplier.ApplyPreset(targetPreset);
+        }
+
+        static public void TestAttachTV()
+        {
+            DISPLAY_DEVICE displayDevice = new DISPLAY_DEVICE();
+            displayDevice.cb = System.Runtime.InteropServices.Marshal.SizeOf(displayDevice);
+
+            DisplaySettings.EnumDisplayDevices(
+                null,
+                2,  // TV is the third device
+                ref displayDevice,
+                0);
+
+            DEVMODE devmode = DisplaySettings.MakeNewDevmode();
+            devmode.dmDeviceName = displayDevice.DeviceName;
+            devmode.dmPelsHeight = 1080;
+            devmode.dmPelsWidth = 1920;
+            devmode.dmDisplayOrientation = 0;
+            devmode.dmDisplayFrequency = 60;
+            devmode.dmPosition = new POINTL();
+            devmode.dmPosition.x = -1050;
+            devmode.dmPosition.y = -128;
+            devmode.dmFields = DM.PelsHeight | DM.PelsWidth | DM.DisplayOrientation | DM.DisplayFrequency | DM.Position;
+
+            ConsoleOutputUtilities.WriteDisplayDeviceSettingsToConsole(devmode, devmode.dmDeviceName);
+
+            DISP_CHANGE result = DisplaySettings.ChangeDisplaySettingsEx(
+                devmode.dmDeviceName,
+                ref devmode,
+                IntPtr.Zero,
+                ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY | ChangeDisplaySettingsFlags.CDS_NORESET,
+                IntPtr.Zero);
+
+            Console.WriteLine("Result code: " + result);
+
+            result = DisplaySettings.ChangeDisplaySettingsEx(
+                IntPtr.Zero,
+                IntPtr.Zero,
+                IntPtr.Zero,
+                0,
+                IntPtr.Zero);
+
+            Console.WriteLine("Result code: " + result);
         }
     }
 }

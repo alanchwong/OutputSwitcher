@@ -27,6 +27,12 @@ namespace OutputSwitcherConsole.WinAPI
             uint dwFlags);
 
         [DllImport("user32.dll")]
+        public static extern DISP_CHANGE ChangeDisplaySettings(ref DEVMODE devMode, ChangeDisplaySettingsFlags flags);
+
+        [DllImport("user32.dll")]
+        public static extern DISP_CHANGE ChangeDisplaySettings(IntPtr devMode, ChangeDisplaySettingsFlags flags);
+
+        [DllImport("user32.dll")]
         static extern public DISP_CHANGE ChangeDisplaySettingsEx(
             string lpszDeviceName,
             ref DEVMODE lpDevMode,
@@ -53,6 +59,25 @@ namespace OutputSwitcherConsole.WinAPI
         static public bool IsDisplayAttachedToDesktop(DEVMODE devMode)
         {
             return (devMode.dmPelsHeight != 0 && devMode.dmPelsWidth != 0);
+        }
+
+        /// <summary>
+        /// Return an empty DEVMODE with dmSize set properly and dmDriverExtra set to 0.
+        /// </summary>
+        /// <returns>New empty DEVMODE ready to use.</returns>
+        static public DEVMODE MakeNewDevmode()
+        {
+            DEVMODE devMode = new DEVMODE();
+            devMode.dmSize = (short)System.Runtime.InteropServices.Marshal.SizeOf(devMode);
+            devMode.dmDriverExtra = 0;
+            return devMode;
+        }
+
+        static public DISPLAY_DEVICE MakeNewDisplayDevice()
+        {
+            DISPLAY_DEVICE displayDevice = new DISPLAY_DEVICE();
+            displayDevice.cb = System.Runtime.InteropServices.Marshal.SizeOf(displayDevice);
+            return displayDevice;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace OutputSwitcherConsole.Data
 
         }
 
-        public DisplayDeviceSettings(string deviceName, DEVMODE devMode)
+        public DisplayDeviceSettings(string deviceName, string deviceID, DEVMODE devMode)
         {
             mDeviceName = deviceName;
             mPosition.x = devMode.dmPosition.x;
@@ -36,6 +36,8 @@ namespace OutputSwitcherConsole.Data
             mPelsHeight = devMode.dmPelsHeight;
             mPelsWidth = devMode.dmPelsWidth;
             mOrientation = devMode.dmDisplayOrientation;
+            DisplayFrequency = devMode.dmDisplayFrequency;
+            DeviceID = deviceID;
         }
 
         /// <summary>
@@ -73,6 +75,20 @@ namespace OutputSwitcherConsole.Data
             set { mOrientation = value; }
         }
 
+        public Int32 DisplayFrequency
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// DeviceID from a DISPLAY_DEVICE struct returned by EnumDisplayDevices that identifies
+        /// a specific physical monitor.
+        /// </summary>
+        public string DeviceID
+        {
+            get; set;
+        }
+
         /// <summary>
         /// Provides a DEVMODE struct populated with the values of this DisplayDeviceSettings
         /// instance with the DEVMODE.dmFields member set to indicate that all counterparts
@@ -85,12 +101,14 @@ namespace OutputSwitcherConsole.Data
 
             devMode.dmSize = (short)System.Runtime.InteropServices.Marshal.SizeOf(devMode);
             devMode.dmDriverExtra = 0;
+            devMode.dmPosition = new WinAPI.POINTL();
             devMode.dmPosition.x = Position.x;
             devMode.dmPosition.y = Position.y;
             devMode.dmPelsWidth = PelsWidth;
             devMode.dmPelsHeight = PelsHeight;
             devMode.dmDisplayOrientation = Orientation;
-            devMode.dmFields = DM.Position | DM.PelsHeight | DM.PelsWidth | DM.DisplayOrientation;
+            devMode.dmDisplayFrequency = DisplayFrequency;
+            devMode.dmFields = DM.Position | DM.PelsHeight | DM.PelsWidth | DM.DisplayOrientation | DM.DisplayFrequency;
 
             return devMode;
         }
