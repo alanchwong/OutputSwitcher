@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 using OutputSwitcherConsole.Data;
 using OutputSwitcherConsole.WinAPI;
@@ -72,13 +73,19 @@ namespace OutputSwitcherConsole
                 devMode.dmSize = (short)System.Runtime.InteropServices.Marshal.SizeOf(devMode);
                 devMode.dmDriverExtra = 0;
 
-                DisplaySettings.EnumDisplaySettingsEx(
+                int modeNum = 0;
+
+                while (DisplaySettings.EnumDisplaySettingsEx(
                     displayAdapterName,
                     DisplaySettings.ENUM_CURRENT_SETTINGS,
                     ref devMode,
-                    0);
+                    0))
+                {
+                    ConsoleOutputUtilities.WriteDisplayDeviceSettingsToConsole(devMode, displayAdapterName);
+                    modeNum++;
+                    break;
+                }
 
-                ConsoleOutputUtilities.WriteDisplayDeviceSettingsToConsole(devMode, displayAdapterName);
 
                 uint innerDevNum = 0;
 
@@ -88,13 +95,18 @@ namespace OutputSwitcherConsole
                 {
                     DEVMODE innerDevMode = DisplaySettings.MakeNewDevmode();
 
-                    DisplaySettings.EnumDisplaySettingsEx(
-                        innerDisplayDevice.DeviceName,
-                        DisplaySettings.ENUM_CURRENT_SETTINGS,
-                        ref innerDevMode,
-                        0);
+                    int innerModeNum = 0;
 
-                    ConsoleOutputUtilities.WriteDisplayDeviceSettingsToConsole(innerDevMode, innerDisplayDevice.DeviceName);
+                    while (DisplaySettings.EnumDisplaySettingsEx(
+                        innerDisplayDevice.DeviceName,
+                        DisplaySettings.ENUM_REGISTRY_SETTINGS, //innerModeNum,
+                        ref innerDevMode,
+                        0))
+                    {
+                        ConsoleOutputUtilities.WriteDisplayDeviceSettingsToConsole(innerDevMode, innerDisplayDevice.DeviceName);
+                        innerModeNum++;
+                    }
+
 
                     innerDevNum++;
                 }
@@ -376,12 +388,19 @@ namespace OutputSwitcherConsole
 
             DisplaySettings.EnumDisplayDevices(
                 null,
-                2,  // TV is the third device
+                1,  // TV is the third device
                 ref displayDevice,
                 0);
 
+            DISPLAY_DEVICE innerDisplayDevice = DisplaySettings.MakeNewDisplayDevice();
+            DisplaySettings.EnumDisplayDevices(
+                displayDevice.DeviceName,
+                0,
+                ref innerDisplayDevice,
+                0);
+
             DEVMODE devmode = DisplaySettings.MakeNewDevmode();
-            devmode.dmDeviceName = displayDevice.DeviceName;
+            devmode.dmDeviceName = "\\\\.\\DISPLAY4"; // innerDisplayDevice.DeviceName; // displayDevice.DeviceName;
             devmode.dmPelsHeight = 1080;
             devmode.dmPelsWidth = 1920;
             devmode.dmDisplayOrientation = 0;
@@ -410,6 +429,187 @@ namespace OutputSwitcherConsole
                 IntPtr.Zero);
 
             Console.WriteLine("Result code: " + result);
+        }
+
+        public static void TestCustomChangeDisplaySettings()
+        {
+            string deviceName;
+            Int32 pelsHeight;
+            Int32 pelsWidth;
+            Int32 displayFrequency;
+            Int32 positionX;
+            Int32 positionY;
+            Int32 displayOrientation;
+
+            Console.Write("Device name: ");
+            deviceName = Console.ReadLine();
+
+            Console.Write("Pixels Height: ");
+            pelsHeight = Int32.Parse(Console.ReadLine());
+
+            Console.Write("Pixels Width: ");
+            pelsWidth = Int32.Parse(Console.ReadLine());
+
+            Console.Write("Display frequency: ");
+            displayFrequency = Int32.Parse(Console.ReadLine());
+
+            Console.Write("Position X: ");
+            positionX = Int32.Parse(Console.ReadLine());
+
+            Console.Write("Position Y: ");
+            positionY = Int32.Parse(Console.ReadLine());
+
+            Console.Write("Display orientation: ");
+            displayOrientation = Int32.Parse(Console.ReadLine());
+
+            DEVMODE devmode = DisplaySettings.MakeNewDevmode();
+            devmode.dmPelsHeight = pelsHeight;
+            devmode.dmPelsWidth = pelsWidth;
+            devmode.dmDisplayFrequency = displayFrequency;
+            devmode.dmPosition = new POINTL();
+            devmode.dmPosition.x = positionX;
+            devmode.dmPosition.y = positionY;
+            devmode.dmDisplayOrientation = displayOrientation;
+            devmode.dmFields = DM.PelsHeight | DM.PelsWidth | DM.DisplayFrequency | DM.Position | DM.DisplayOrientation;
+
+            Console.WriteLine("Applying these settings: ");
+            ConsoleOutputUtilities.WriteDisplayDeviceSettingsToConsole(devmode, deviceName);
+
+            Console.Write("Continue? [Y]/N: ");
+            string response = Console.ReadLine();
+            if (response.Length == 0 || Char.ToUpper(response[0]) == 'Y')
+            {
+                Console.WriteLine("Applying settings.");
+
+                DISP_CHANGE result = DisplaySettings.ChangeDisplaySettingsEx(
+                    deviceName,
+                    ref devmode,
+                    IntPtr.Zero,
+                    ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY | ChangeDisplaySettingsFlags.CDS_NORESET,
+                    IntPtr.Zero);
+
+                Console.WriteLine("Result code: " + result.ToString());
+
+                result = DisplaySettings.ChangeDisplaySettingsEx(
+                    IntPtr.Zero,
+                    IntPtr.Zero,
+                    IntPtr.Zero,
+                    0,
+                    IntPtr.Zero);
+
+                Console.WriteLine("Result code: " + result.ToString());
+
+            }
+        }
+
+        public static void TestCCDExampleCodeAll()
+        {
+            Console.WriteLine("** ALL PATHS **");
+            TestCCDExampleCode(CCD.QueryDisplayFlags.AllPaths);
+        }
+
+        public static void TestCCDExampleCodeOnlyActive()
+        {
+            Console.WriteLine("** ONLY ACTIVE PATHS **");
+            TestCCDExampleCode(CCD.QueryDisplayFlags.OnlyActivePaths);
+        }
+
+        public static void TestCCDExampleCode(CCD.QueryDisplayFlags queryDisplayFlags)
+        {
+            int resultCode;
+
+            int numPathArrayElements;
+            int numModeInfoArrayElements;
+
+            // Get buffer size required to enumerate all valid paths.
+            resultCode = CCD.GetDisplayConfigBufferSizes(queryDisplayFlags, out numPathArrayElements, out numModeInfoArrayElements);
+
+            Win32Utilities.ThrowIfResultCodeNotSuccess(resultCode);
+
+            CCD.DisplayConfigPathInfo[] pathInfoArray = new CCD.DisplayConfigPathInfo[numPathArrayElements];
+            CCD.DisplayConfigModeInfo[] modeInfoArray = new CCD.DisplayConfigModeInfo[numModeInfoArrayElements];
+
+            resultCode = CCD.QueryDisplayConfig(
+                queryDisplayFlags,
+                ref numPathArrayElements,
+                pathInfoArray,
+                ref numModeInfoArrayElements,
+                modeInfoArray,
+                IntPtr.Zero);
+
+            Win32Utilities.ThrowIfResultCodeNotSuccess(resultCode);
+
+            foreach (CCD.DisplayConfigPathInfo configPathInfo in pathInfoArray)
+            {
+                ConsoleOutputUtilities.WriteDisplayConfigPathInfoToConsole(configPathInfo);
+                Console.WriteLine();
+            }
+
+            foreach (CCD.DisplayConfigModeInfo configModeInfo in modeInfoArray)
+            {
+                ConsoleOutputUtilities.WriteDisplayConfigModeInfoToConsole(configModeInfo);
+                Console.WriteLine();
+            }
+
+            // Find and store the primary path based by looking for an active path that is located at desktop position
+            // 0,0
+            CCD.DisplayConfigPathInfo primaryPath = new CCD.DisplayConfigPathInfo();
+            bool primaryPathFound = false;
+
+            foreach (CCD.DisplayConfigPathInfo configPathInfo in pathInfoArray)
+            {
+                if ((configPathInfo.flags & (uint)CCD.DisplayConfigFlags.PathActive) > 0)
+                {
+                    if (configPathInfo.sourceInfo.modeInfoIdx > modeInfoArray.Length - 1)
+                        throw new Exception("Config Path Info Source Mode Info Index is out of range.");
+
+                    CCD.DisplayConfigModeInfo modeInfo = modeInfoArray[configPathInfo.sourceInfo.modeInfoIdx];
+
+                    if (modeInfo.infoType == CCD.DisplayConfigModeInfoType.Source &&
+                        modeInfo.sourceMode.position.x == 0 &&
+                        modeInfo.sourceMode.position.y == 0)
+                    {
+                        // Bingo
+                        primaryPath = configPathInfo;
+                        primaryPathFound = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!primaryPathFound)
+                throw new Exception("Failed to find primary display path!");
+
+            CCD.DisplayConfigTargetDeviceName dcTargetDeviceName = new CCD.DisplayConfigTargetDeviceName();
+            dcTargetDeviceName.header.type = CCD.DisplayConfigDeviceInfoType.GetTargetName;
+            dcTargetDeviceName.header.size = (uint)Marshal.SizeOf(dcTargetDeviceName);
+            dcTargetDeviceName.header.adapterId = primaryPath.targetInfo.adapterId;
+            dcTargetDeviceName.header.id = primaryPath.targetInfo.id;
+
+            resultCode = CCD.DisplayConfigGetDeviceInfo(ref dcTargetDeviceName);
+
+            Win32Utilities.ThrowIfResultCodeNotSuccess(resultCode);
+
+            ConsoleOutputUtilities.WriteDisplayConfigTargetDeviceNameToConsole(dcTargetDeviceName);
+            Console.WriteLine();
+
+            CCD.DisplayConfigSourceDeviceName dcSourceDeviceName = new CCD.DisplayConfigSourceDeviceName();
+            dcSourceDeviceName.header.type = CCD.DisplayConfigDeviceInfoType.GetSourceName;
+            dcSourceDeviceName.header.size = (uint)Marshal.SizeOf(dcSourceDeviceName);
+            dcSourceDeviceName.header.adapterId = primaryPath.sourceInfo.adapterId;
+            dcSourceDeviceName.header.id = primaryPath.sourceInfo.id;
+
+            resultCode = CCD.DisplayConfigGetDeviceInfo(ref dcSourceDeviceName);
+
+            Win32Utilities.ThrowIfResultCodeNotSuccess(resultCode);
+
+            CCD.DisplayConfigTargetPreferredMode dcTargetPreferredMode = new CCD.DisplayConfigTargetPreferredMode();
+            dcTargetPreferredMode.header.type = CCD.DisplayConfigDeviceInfoType.GetTargetPreferredMode;
+            dcTargetPreferredMode.header.size = (uint)Marshal.SizeOf(dcTargetPreferredMode);
+            dcTargetPreferredMode.header.adapterId = primaryPath.targetInfo.adapterId;
+            dcTargetPreferredMode.header.id = primaryPath.targetInfo.id;
+
+            Win32Utilities.ThrowIfResultCodeNotSuccess(CCD.DisplayConfigGetDeviceInfo(ref dcTargetPreferredMode));
         }
     }
 }

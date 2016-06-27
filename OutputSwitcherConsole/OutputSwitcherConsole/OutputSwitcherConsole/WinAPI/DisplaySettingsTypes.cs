@@ -41,12 +41,6 @@ namespace OutputSwitcherConsole.WinAPI
         DisplayFixedOutput = 0x20000000
     }
 
-    public struct POINTL
-    {
-        public Int32 x;
-        public Int32 y;
-    }
-
     /// <summary>
     /// Specifies whether collation should be used when printing multiple copies.
     /// </summary>

@@ -23,6 +23,9 @@ namespace OutputSwitcherConsole
             CaptureCurrentConfigAndSaveAsPreset,
             ApplyPreset,
             TestAttachTV,
+            TestCustomChangeDisplaySettings,
+            TestCCDExampleCodeAll,
+            TestCCDExampleCodeOnlyActive,
             Unknown,
         }
 
@@ -57,6 +60,9 @@ namespace OutputSwitcherConsole
             new CommandActionWithBlurbAndAction(CommandAction.CaptureCurrentConfigAndSaveAsPreset, "Capture current display configuration and save as preset.", ConsoleCommands.CaptureCurrentConfigAndSaveAsPreset),
             new CommandActionWithBlurbAndAction(CommandAction.ApplyPreset, "Apply a saved preset.", ConsoleCommands.ApplyPreset),
             new CommandActionWithBlurbAndAction(CommandAction.TestAttachTV, "(Test) Attach TV.", ConsoleCommands.TestAttachTV),
+            new CommandActionWithBlurbAndAction(CommandAction.TestCustomChangeDisplaySettings, "(Test) Custom change display settings", ConsoleCommands.TestCustomChangeDisplaySettings),
+            new CommandActionWithBlurbAndAction(CommandAction.TestCCDExampleCodeAll, "(Test) CCD Example Code All Paths", ConsoleCommands.TestCCDExampleCodeAll),
+            new CommandActionWithBlurbAndAction(CommandAction.TestCCDExampleCodeOnlyActive, "(Test) CCD Example Code Only Active Paths", ConsoleCommands.TestCCDExampleCodeOnlyActive),
         };
 
         /// <summary>
