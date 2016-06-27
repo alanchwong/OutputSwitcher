@@ -11,16 +11,6 @@ namespace OutputSwitcherConsole.Data
     public class DisplayDeviceSettings
     {
         /// <summary>
-        /// Type for DisplayDeviceSettings that mirrors the DEVMODE.mPosition POINTL struct.
-        /// </summary>
-        [Serializable]
-        public struct POINTL
-        {
-            public Int32 x;
-            public Int32 y;
-        }
-
-        /// <summary>
         /// Creates an empty DisplayDeviceSettings. Required for serialization.
         /// </summary>
         public DisplayDeviceSettings()

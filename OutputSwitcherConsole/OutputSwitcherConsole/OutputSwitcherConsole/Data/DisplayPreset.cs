@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using OutputSwitcherConsole.WinAPI;
+
 namespace OutputSwitcherConsole.Data
 {
     [Serializable]
@@ -34,6 +36,16 @@ namespace OutputSwitcherConsole.Data
         {
             get { return mDisplaySettings; }
             set { mDisplaySettings = value; }
+        }
+
+        public CCD.DisplayConfigPathInfo[] PathInfoArray
+        {
+            get; set;
+        }
+                 
+        public CCD.DisplayConfigModeInfo[] ModeInfoArray
+        {
+            get; set;
         }
 
         private List<DisplayDeviceSettings> mDisplaySettings = null;

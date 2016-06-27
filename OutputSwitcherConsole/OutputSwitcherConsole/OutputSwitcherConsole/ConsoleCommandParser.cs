@@ -26,6 +26,8 @@ namespace OutputSwitcherConsole
             TestCustomChangeDisplaySettings,
             TestCCDExampleCodeAll,
             TestCCDExampleCodeOnlyActive,
+            RecordCurrentDisplayConfigThroughCCD,
+            ApplySavedPresetCCD,
             Unknown,
         }
 
@@ -63,6 +65,8 @@ namespace OutputSwitcherConsole
             new CommandActionWithBlurbAndAction(CommandAction.TestCustomChangeDisplaySettings, "(Test) Custom change display settings", ConsoleCommands.TestCustomChangeDisplaySettings),
             new CommandActionWithBlurbAndAction(CommandAction.TestCCDExampleCodeAll, "(Test) CCD Example Code All Paths", ConsoleCommands.TestCCDExampleCodeAll),
             new CommandActionWithBlurbAndAction(CommandAction.TestCCDExampleCodeOnlyActive, "(Test) CCD Example Code Only Active Paths", ConsoleCommands.TestCCDExampleCodeOnlyActive),
+            new CommandActionWithBlurbAndAction(CommandAction.RecordCurrentDisplayConfigThroughCCD, "Record current display configuration as preset. (CCD)", ConsoleCommands.RecordCurrentDisplayConfigThroughCCD),
+            new CommandActionWithBlurbAndAction(CommandAction.ApplySavedPresetCCD, "Apply saved preset. (CCD)", ConsoleCommands.ApplySavedPresetCCD),
         };
 
         /// <summary>

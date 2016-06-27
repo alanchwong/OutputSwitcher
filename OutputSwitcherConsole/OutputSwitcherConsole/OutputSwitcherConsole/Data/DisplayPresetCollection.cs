@@ -100,7 +100,7 @@ namespace OutputSwitcherConsole.Data
         /// </summary>
         private DisplayPresetCollection()
         {
-            mDisplayPresetDictionary = new Dictionary<string, DisplayPreset>();
+            mDisplayPresetDictionary = new Dictionary<string, DisplayPreset>(StringComparer.CurrentCultureIgnoreCase);
 
             // RAII baby, load it up
             List<DisplayPreset> displayPresets = DisplayDeviceSettingsPersistence.LoadSettings();

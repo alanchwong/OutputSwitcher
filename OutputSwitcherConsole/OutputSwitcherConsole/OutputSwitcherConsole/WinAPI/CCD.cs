@@ -7,20 +7,8 @@ using System.Threading.Tasks;
 
 namespace OutputSwitcherConsole.WinAPI
 {
-    class CCD
+    public class CCD
     {
-        [StructLayout(LayoutKind.Sequential)]
-        public struct LUID
-        {
-            public UInt32 LowPart;
-            public UInt32 HighPart;
-
-            public override string ToString()
-            {
-                return "High: " + HighPart + ", Low: " + LowPart;
-            }
-        }
-
         public enum DisplayConfigVideoOutputTechnology : uint
         {
             Other = 4294967295, // -1
@@ -145,11 +133,17 @@ namespace OutputSwitcherConsole.WinAPI
             ForceUint32 = 0xFFFFFFFF
         }
 
+        [Serializable]
         [StructLayout(LayoutKind.Sequential)]
-        public struct DisplayConfigRational
+        public struct LUID
         {
-            public uint numerator;
-            public uint denominator;
+            public UInt32 LowPart;
+            public UInt32 HighPart;
+
+            public override string ToString()
+            {
+                return "High: " + HighPart + ", Low: " + LowPart;
+            }
         }
 
         [Flags]
@@ -163,14 +157,6 @@ namespace OutputSwitcherConsole.WinAPI
             ForceUint32 = 0xFFFFFFFF
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct DisplayConfigPathInfo
-        {
-            public DisplayConfigPathSourceInfo sourceInfo;
-            public DisplayConfigPathTargetInfo targetInfo;
-            public uint flags;
-        }
-
         public enum DisplayConfigModeInfoType : UInt32
         {
             Zero = 0,
@@ -179,35 +165,6 @@ namespace OutputSwitcherConsole.WinAPI
             Target = 2,
             Desktop = 3,
             ForceUint32 = 0xFFFFFFFF
-        }
-
-        [StructLayout(LayoutKind.Explicit)]
-        public struct DisplayConfigModeInfo
-        {
-            [FieldOffset(0)]
-            public DisplayConfigModeInfoType infoType;
-
-            [FieldOffset(4)]
-            public UInt32 id;
-
-            [FieldOffset(8)]
-            public LUID adapterId;
-
-            [FieldOffset(16)]
-            public DisplayConfigTargetMode targetMode;
-
-            [FieldOffset(16)]
-            public DisplayConfigSourceMode sourceMode;
-
-            [FieldOffset(16)]
-            public DisplayConfigDesktopImageInfo desktopImageInfo;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct DisplayConfig2DRegion
-        {
-            public uint cx;
-            public uint cy;
         }
 
         [Flags]
@@ -248,6 +205,65 @@ namespace OutputSwitcherConsole.WinAPI
             Other = 255
         }
 
+        [Serializable]
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DisplayConfigRational
+        {
+            public uint numerator;
+            public uint denominator;
+        }
+
+        [Serializable]
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DisplayConfigPathInfo
+        {
+            public DisplayConfigPathSourceInfo sourceInfo;
+            public DisplayConfigPathTargetInfo targetInfo;
+            public uint flags;
+        }
+
+        [Serializable]
+        [StructLayout(LayoutKind.Explicit)]
+        public struct DisplayConfigModeInfo
+        {
+            [FieldOffset(0)]
+            public DisplayConfigModeInfoType infoType;
+
+            [FieldOffset(4)]
+            public UInt32 id;
+
+            [FieldOffset(8)]
+            public LUID adapterId;
+
+            // Since the targetMode, sourceMode, and desktopImageInfo properties all occupy the same
+            // field offset but are different in size and makeup, we need to tell the serializer when
+            // they should be serialized, and when not to be. Apparently there is a pattern that the
+            // XML serializer looks for, public bool ShouldSerialize<propertyname>, to determine
+            // whether a given attribute should be serialized. Maybe this is how the "code behind" of
+            // some serialization attribute works?
+
+            [FieldOffset(16)]
+            public DisplayConfigTargetMode targetMode;
+            public bool ShouldSerializetargetMode() { return infoType == DisplayConfigModeInfoType.Target; }
+
+            [FieldOffset(16)]
+            public DisplayConfigSourceMode sourceMode;
+            public bool ShouldSerializesourceMode() { return infoType == DisplayConfigModeInfoType.Source; }
+
+            [FieldOffset(16)]
+            public DisplayConfigDesktopImageInfo desktopImageInfo;
+            public bool ShouldSerializedesktopImageInfo() { return infoType == DisplayConfigModeInfoType.Desktop; }
+        }
+
+        [Serializable]
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DisplayConfig2DRegion
+        {
+            public uint cx;
+            public uint cy;
+        }
+
+        [Serializable]
         [StructLayout(LayoutKind.Explicit)]
         public struct DisplayConfigVideoSignalInfo
         {
@@ -284,6 +300,7 @@ namespace OutputSwitcherConsole.WinAPI
             public DisplayConfigScanLineOrdering ScanLineOrdering;
         }
 
+        [Serializable]
         [StructLayout(LayoutKind.Sequential)]
         public struct VSyncFreqDivider
         {
@@ -300,12 +317,14 @@ namespace OutputSwitcherConsole.WinAPI
             }
         }
 
+        [Serializable]
         [StructLayout(LayoutKind.Sequential)]
         public struct DisplayConfigTargetMode
         {
             public DisplayConfigVideoSignalInfo targetVideoSignalInfo;
         }
 
+        [Serializable]
         [StructLayout(LayoutKind.Sequential)]
         public struct DisplayConfigSourceMode
         {
@@ -315,6 +334,7 @@ namespace OutputSwitcherConsole.WinAPI
             public POINTL position;
         }
 
+        [Serializable]
         [StructLayout(LayoutKind.Sequential)]
         public struct DisplayConfigDesktopImageInfo
         {
@@ -323,18 +343,7 @@ namespace OutputSwitcherConsole.WinAPI
             public RECTL desktopImageClip;
         }
 
-        /*
-        [StructLayout(LayoutKind.Sequential)]
-        public struct DisplayConfigPathSourceInfo
-        {
-            public LUID adapterId;
-            public uint id;
-            public uint modeInfoIdx;
-
-            public DisplayConfigSourceStatus statusFlags;
-        }
-        */
-
+        [Serializable]
         [StructLayout(LayoutKind.Explicit)]
         public struct DisplayConfigPathSourceInfo
         {
@@ -364,24 +373,7 @@ namespace OutputSwitcherConsole.WinAPI
             public DisplayConfigSourceStatus statusFlags;
         }
 
-        /*
-        [StructLayout(LayoutKind.Sequential)]
-        public struct DisplayConfigPathTargetInfo
-        {
-            public LUID adapterId;
-            public uint id;
-            public uint modeInfoIdx;
-            public DisplayConfigVideoOutputTechnology outputTechnology;
-            public DisplayConfigRotation rotation;
-            public DisplayConfigScaling scaling;
-            public DisplayConfigRational refreshRate;
-            public DisplayConfigScanLineOrdering scanLineOrdering;
-
-            public bool targetAvailable;
-            public DisplayConfigTargetStatus statusFlags;
-        }
-        */
-
+        [Serializable]
         [StructLayout(LayoutKind.Explicit)]
         public struct DisplayConfigPathTargetInfo
         {
@@ -466,9 +458,10 @@ namespace OutputSwitcherConsole.WinAPI
 
         /// <summary>
         /// Empty interface to provide common root type for all structs used with DisplayConfigGetDeviceInfo.
-        /// </summary>
+        /// </summary>        
         public interface IDisplayConfigInfo {}
 
+        [Serializable]
         [StructLayout(LayoutKind.Sequential)]
         public struct DisplayConfigDeviceInfoHeader
         {
@@ -478,6 +471,7 @@ namespace OutputSwitcherConsole.WinAPI
             public UInt32 id;
         }
 
+        [Serializable]
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct DisplayConfigSourceDeviceName : IDisplayConfigInfo
         {
@@ -489,6 +483,7 @@ namespace OutputSwitcherConsole.WinAPI
 
         }
 
+        [Serializable]
         [StructLayout(LayoutKind.Sequential)]
         public struct DisplayConfigTargetDeviceNameFlags
         {
@@ -513,6 +508,7 @@ namespace OutputSwitcherConsole.WinAPI
             }
         }
 
+        [Serializable]
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct DisplayConfigTargetDeviceName : IDisplayConfigInfo
         {
@@ -537,6 +533,7 @@ namespace OutputSwitcherConsole.WinAPI
             public string monitorDevicePath;
         }
 
+        [Serializable]
         [StructLayout(LayoutKind.Sequential)]
         public struct DisplayConfigTargetPreferredMode : IDisplayConfigInfo
         {
@@ -551,9 +548,9 @@ namespace OutputSwitcherConsole.WinAPI
         [DllImport("User32.dll")]
         public static extern int SetDisplayConfig(
             uint numPathArrayElements,
-            [In] DisplayConfigPathInfo pathArray,
+            [In] DisplayConfigPathInfo[] pathArray,
             uint numModeInfoArrayElements,
-            [In] DisplayConfigModeInfo modeInfoArray,
+            [In] DisplayConfigModeInfo[] modeInfoArray,
             SdcFlags flags);
 
         [DllImport("User32.dll")]

@@ -611,5 +611,87 @@ namespace OutputSwitcherConsole
 
             Win32Utilities.ThrowIfResultCodeNotSuccess(CCD.DisplayConfigGetDeviceInfo(ref dcTargetPreferredMode));
         }
+
+        public static void RecordCurrentDisplayConfigThroughCCD()
+        {
+            const CCD.QueryDisplayFlags OnlyActivePathsFlag = CCD.QueryDisplayFlags.OnlyActivePaths;
+
+            int numPathArrayElements;
+            int numModeInfoArrayElements;
+
+            // Get the buffer sizes needed to hold the active paths and the source/target mode table.
+            Win32Utilities.ThrowIfResultCodeNotSuccess(
+                CCD.GetDisplayConfigBufferSizes(
+                    OnlyActivePathsFlag,
+                    out numPathArrayElements,
+                    out numModeInfoArrayElements));
+
+            CCD.DisplayConfigPathInfo[] pathInfoArray = new CCD.DisplayConfigPathInfo[numPathArrayElements];
+            CCD.DisplayConfigModeInfo[] modeInfoArray = new CCD.DisplayConfigModeInfo[numModeInfoArrayElements];
+
+            // Get the active paths and their associated source/target modes.
+            Win32Utilities.ThrowIfResultCodeNotSuccess(
+                CCD.QueryDisplayConfig(
+                    OnlyActivePathsFlag,
+                    ref numPathArrayElements,
+                    pathInfoArray,
+                    ref numModeInfoArrayElements,
+                    modeInfoArray,
+                    IntPtr.Zero));
+
+            DisplayPreset currentDisplayConfigAsPreset = null;
+
+            DisplayPresetCollection displayPresetCollection = DisplayPresetCollection.GetDisplayPresetCollection();
+
+            do
+            {
+                Console.Write("Enter name of new preset: ");
+                string newPresetName = Console.ReadLine();
+
+                if (displayPresetCollection.GetPreset(newPresetName) == null)
+                {
+                    currentDisplayConfigAsPreset = new DisplayPreset(newPresetName);
+                }
+                else
+                {
+                    Console.WriteLine("Preset with name: " + newPresetName + " already exists!");
+                }
+
+            } while (currentDisplayConfigAsPreset == null);
+
+            currentDisplayConfigAsPreset.PathInfoArray = pathInfoArray;
+            currentDisplayConfigAsPreset.ModeInfoArray = modeInfoArray;
+
+            bool tryAddPresetResult = displayPresetCollection.TryAddDisplayPreset(currentDisplayConfigAsPreset);
+
+            if (!tryAddPresetResult)
+            {
+                throw new Exception("Unexpected failure when trying to add new preset.");
+            }
+        }
+
+        public static void ApplySavedPresetCCD()
+        {
+            DisplayPresetCollection displayPresetCollection = DisplayPresetCollection.GetDisplayPresetCollection();
+
+            Console.Write("Enter name of preset to load: ");
+            string presetName = Console.ReadLine();
+
+            DisplayPreset desiredPreset = displayPresetCollection.GetPreset(presetName);
+
+            if (desiredPreset == null)
+            {
+                Console.WriteLine("Preset with specified name does not exist!");
+                return;
+            }
+
+            Win32Utilities.ThrowIfResultCodeNotSuccess(
+                CCD.SetDisplayConfig(
+                    (uint)desiredPreset.PathInfoArray.Length,
+                    desiredPreset.PathInfoArray,
+                    (uint)desiredPreset.ModeInfoArray.Length,
+                    desiredPreset.ModeInfoArray,
+                    CCD.SdcFlags.Apply | CCD.SdcFlags.UseSuppliedDisplayConfig | CCD.SdcFlags.AllowChanges | CCD.SdcFlags.SaveToDatabase));
+        }
     }
 }
