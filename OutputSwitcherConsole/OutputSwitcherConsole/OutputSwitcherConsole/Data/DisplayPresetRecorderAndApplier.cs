@@ -54,6 +54,15 @@ namespace OutputSwitcherConsole.Data
             displayPreset.PathInfoArray = pathInfoArray;
             displayPreset.ModeInfoArray = modeInfoArray;
 
+            CCD.DisplayConfigTargetDeviceName[] targetDeviceNameArray = new CCD.DisplayConfigTargetDeviceName[pathInfoArray.Length];
+
+            for (int i = 0; i < pathInfoArray.Length; i++)
+            {
+                targetDeviceNameArray[i] = GetTargetDeviceName(pathInfoArray[i].targetInfo.adapterId, pathInfoArray[i].targetInfo.id);
+            }
+
+            displayPreset.TargetDeviceNames = targetDeviceNameArray;
+
             return displayPreset;
         }
 
@@ -71,6 +80,26 @@ namespace OutputSwitcherConsole.Data
                     (uint)displayPreset.ModeInfoArray.Length,
                     displayPreset.ModeInfoArray,
                     CCD.SdcFlags.Apply | CCD.SdcFlags.UseSuppliedDisplayConfig | CCD.SdcFlags.AllowChanges | CCD.SdcFlags.SaveToDatabase));
+        }
+
+        /// <summary>
+        /// Gets the display target name.
+        /// </summary>
+        /// <param name="targetAdapterId"></param>
+        /// <param name="targetId"></param>
+        /// <returns></returns>
+        static private CCD.DisplayConfigTargetDeviceName GetTargetDeviceName(CCD.LUID targetAdapterId, uint targetId)
+        {
+            CCD.DisplayConfigTargetDeviceName targetDeviceName = new CCD.DisplayConfigTargetDeviceName();
+
+            targetDeviceName.header.type = CCD.DisplayConfigDeviceInfoType.GetTargetName;
+            targetDeviceName.header.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(targetDeviceName);
+            targetDeviceName.header.adapterId = targetAdapterId;
+            targetDeviceName.header.id = targetId;
+
+            Win32Utilities.ThrowIfResultCodeNotSuccess(CCD.DisplayConfigGetDeviceInfo(ref targetDeviceName));
+
+            return targetDeviceName;
         }
     }
 }

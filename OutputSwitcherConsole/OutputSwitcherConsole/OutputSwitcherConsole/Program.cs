@@ -10,7 +10,11 @@ namespace OutputSwitcherConsole
     {
         static void Main(string[] args)
         {
-            ConsoleCommandParser.MainLoop();
+            // If no command arguments supplied, enter interactive mode.
+            if (args.Length == 0)
+            {
+                ConsoleCommandParser.MainLoop();
+            }
         }
     }
 }

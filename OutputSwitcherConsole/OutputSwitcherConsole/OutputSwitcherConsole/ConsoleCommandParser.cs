@@ -15,6 +15,7 @@ namespace OutputSwitcherConsole
         {
             Exit,
             ListPresets,
+            ListPresetDetail,
             DeletePreset,
             CaptureCurrentConfigAndSaveAsPreset,
             ApplyPreset,
@@ -46,6 +47,7 @@ namespace OutputSwitcherConsole
         private static readonly CommandActionWithBlurbAndAction[] CommandList = {
             new CommandActionWithBlurbAndAction(CommandAction.Exit, "Exit.", ConsoleCommands.Exit),
             new CommandActionWithBlurbAndAction(CommandAction.ListPresets, "List all saved presets.", ConsoleCommands.ListPresets),
+            new CommandActionWithBlurbAndAction(CommandAction.ListPresetDetail, "List preset detail.", ConsoleCommands.ListPresetDetail),
             new CommandActionWithBlurbAndAction(CommandAction.ApplyPreset, "Apply a saved preset.", ConsoleCommands.ApplyPreset),
             new CommandActionWithBlurbAndAction(CommandAction.DeletePreset, "Delete a saved preset.", ConsoleCommands.DeletePreset),
             new CommandActionWithBlurbAndAction(CommandAction.CaptureCurrentConfigAndSaveAsPreset, "Capture current display configuration and save as preset.", ConsoleCommands.CaptureCurrentConfigAndSaveAsPreset),
@@ -79,6 +81,8 @@ namespace OutputSwitcherConsole
                 {
                     Console.WriteLine("Unknown action.");
                 }
+
+                Console.WriteLine();
 
             } while (true); // Need to invoke the Exit command to call ConsoleCommands.Exit() to terminate program.
         }

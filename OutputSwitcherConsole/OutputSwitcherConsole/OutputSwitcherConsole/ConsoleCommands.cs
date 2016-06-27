@@ -26,9 +26,12 @@ namespace OutputSwitcherConsole
         {
             DisplayPresetCollection presetCollection = DisplayPresetCollection.GetDisplayPresetCollection();
 
+            int index = 1;
+
             foreach (DisplayPreset displayPreset in presetCollection.GetPresets())
             {
-                ConsoleOutputUtilities.WriteDisplayPresetToConsole(displayPreset);
+                Console.WriteLine(String.Format("{0}. {1}", index, displayPreset.Name));
+                index++;
             }
         }
 
@@ -212,6 +215,54 @@ namespace OutputSwitcherConsole
             dcTargetPreferredMode.header.id = primaryPath.targetInfo.id;
 
             Win32Utilities.ThrowIfResultCodeNotSuccess(CCD.DisplayConfigGetDeviceInfo(ref dcTargetPreferredMode));
+        }
+
+        public static void ListPresetDetail()
+        {
+            DisplayPresetCollection displayPresetCollection = DisplayPresetCollection.GetDisplayPresetCollection();
+
+            List<DisplayPreset> displayPresets = displayPresetCollection.GetPresets();
+
+            Console.WriteLine("Available presets: ");
+
+            IEnumerator<DisplayPreset> displayPresetsEnumerator = displayPresets.GetEnumerator();
+
+            for (int i = 0; i < displayPresets.Count; i++)
+            {
+                displayPresetsEnumerator.MoveNext();
+                Console.WriteLine(String.Format("[{0}] {1}", i, displayPresetsEnumerator.Current.Name));
+            }
+
+            Console.Write("Select preset: ");
+            string selection = Console.ReadLine();
+
+            int selectedPresetIndex = -1;
+            string selectedPresetName = String.Empty;
+
+            if (!Int32.TryParse(selection, out selectedPresetIndex))
+            {
+                // If it's not a number, assume the user typed in a name
+                selectedPresetName = selection;
+            }
+            else if (selectedPresetIndex >= displayPresets.Count)
+            {
+                Console.WriteLine("Invalid selection!");
+                return;
+            }
+            else
+            {
+                selectedPresetName = displayPresets[selectedPresetIndex].Name;
+            }
+
+            DisplayPreset selectedPreset = displayPresetCollection.GetPreset(selectedPresetName);
+
+            if (selectedPreset == null)
+            {
+                Console.WriteLine("Invalid preset name: " + selectedPresetName);
+                return;
+            }
+
+            ConsoleOutputUtilities.WriteDisplayPresetToConsole(selectedPreset);
         }
     }
 }

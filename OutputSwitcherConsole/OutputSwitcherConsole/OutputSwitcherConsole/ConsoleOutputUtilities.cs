@@ -33,7 +33,23 @@ namespace OutputSwitcherConsole
         {
             Console.WriteLine("Preset Name: " + displayPreset.Name);
 
-            // TODO: Do more
+            foreach (CCD.DisplayConfigPathInfo dcPathInfo in displayPreset.PathInfoArray)
+            {
+                WriteDisplayConfigPathInfoToConsole(dcPathInfo);
+                Console.WriteLine();
+            }
+
+            foreach (CCD.DisplayConfigModeInfo dcModeInfo in displayPreset.ModeInfoArray)
+            {
+                WriteDisplayConfigModeInfoToConsole(dcModeInfo);
+                Console.WriteLine();
+            }
+
+            foreach (CCD.DisplayConfigTargetDeviceName dcTargetDeviceName in displayPreset.TargetDeviceNames)
+            {
+                WriteDisplayConfigTargetDeviceNameToConsole(dcTargetDeviceName);
+                Console.WriteLine();
+            }
         }
 
         static public void WriteDisplayConfigPathInfoToConsole(CCD.DisplayConfigPathInfo displayConfigPathInfo)

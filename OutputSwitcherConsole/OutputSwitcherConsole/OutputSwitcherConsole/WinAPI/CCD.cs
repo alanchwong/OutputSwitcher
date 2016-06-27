@@ -237,7 +237,8 @@ namespace OutputSwitcherConsole.WinAPI
 
             // Since the targetMode, sourceMode, and desktopImageInfo properties all occupy the same
             // field offset but are different in size and makeup, we need to tell the serializer when
-            // they should be serialized, and when not to be. Apparently there is a pattern that the
+            // they should be serialized, and when not to be as they are binary incompatible which
+            // causes the serializer to throw and exception. Apparently there is a pattern that the
             // XML serializer looks for, public bool ShouldSerialize<propertyname>, to determine
             // whether a given attribute should be serialized. Maybe this is how the "code behind" of
             // some serialization attribute works?
