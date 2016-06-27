@@ -29,15 +29,6 @@ namespace OutputSwitcherConsole.Data
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// The set of DisplayDeviceSetting objects that describe a preset display configuration.
-        /// </summary>
-        public List<DisplayDeviceSettings> DisplaySettings
-        {
-            get { return mDisplaySettings; }
-            set { mDisplaySettings = value; }
-        }
-
         public CCD.DisplayConfigPathInfo[] PathInfoArray
         {
             get; set;
@@ -47,7 +38,5 @@ namespace OutputSwitcherConsole.Data
         {
             get; set;
         }
-
-        private List<DisplayDeviceSettings> mDisplaySettings = null;
     }
 }

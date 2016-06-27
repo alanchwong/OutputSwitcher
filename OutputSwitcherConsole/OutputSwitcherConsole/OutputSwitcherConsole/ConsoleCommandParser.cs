@@ -14,20 +14,12 @@ namespace OutputSwitcherConsole
         private enum CommandAction : uint
         {
             Exit,
-            ShowDisplayDevicesToConsole,
-            ShowDisplayAdapterSettingsToConsole,
-            TestSwapPrimaryAndASecondaryDisplay,
-            TestCaptureCurrentConfigurationAndWriteToFile,
             ListPresets,
             DeletePreset,
             CaptureCurrentConfigAndSaveAsPreset,
             ApplyPreset,
-            TestAttachTV,
-            TestCustomChangeDisplaySettings,
             TestCCDExampleCodeAll,
             TestCCDExampleCodeOnlyActive,
-            RecordCurrentDisplayConfigThroughCCD,
-            ApplySavedPresetCCD,
             Unknown,
         }
 
@@ -53,20 +45,12 @@ namespace OutputSwitcherConsole
         /// </summary>
         private static readonly CommandActionWithBlurbAndAction[] CommandList = {
             new CommandActionWithBlurbAndAction(CommandAction.Exit, "Exit.", ConsoleCommands.Exit),
-            new CommandActionWithBlurbAndAction(CommandAction.ShowDisplayDevicesToConsole, "Enumerate all display devices.", ConsoleCommands.ShowDisplayDevicesToConsole),
-            new CommandActionWithBlurbAndAction(CommandAction.ShowDisplayAdapterSettingsToConsole, "Enumerate display adapters' settings.", ConsoleCommands.ShowDisplayAdapterDeviceSettings),
-            new CommandActionWithBlurbAndAction(CommandAction.TestSwapPrimaryAndASecondaryDisplay, "(Test) Swap Primary and a Secondary Display", ConsoleCommands.TestSwapPrimaryAndASecondaryDisplay),
-            new CommandActionWithBlurbAndAction(CommandAction.TestCaptureCurrentConfigurationAndWriteToFile, "(Test) Capture current configuration and write to file.", ConsoleCommands.TestCaptureCurrentConfigurationAndWriteToFile),
             new CommandActionWithBlurbAndAction(CommandAction.ListPresets, "List all saved presets.", ConsoleCommands.ListPresets),
+            new CommandActionWithBlurbAndAction(CommandAction.ApplyPreset, "Apply a saved preset.", ConsoleCommands.ApplyPreset),
             new CommandActionWithBlurbAndAction(CommandAction.DeletePreset, "Delete a saved preset.", ConsoleCommands.DeletePreset),
             new CommandActionWithBlurbAndAction(CommandAction.CaptureCurrentConfigAndSaveAsPreset, "Capture current display configuration and save as preset.", ConsoleCommands.CaptureCurrentConfigAndSaveAsPreset),
-            new CommandActionWithBlurbAndAction(CommandAction.ApplyPreset, "Apply a saved preset.", ConsoleCommands.ApplyPreset),
-            new CommandActionWithBlurbAndAction(CommandAction.TestAttachTV, "(Test) Attach TV.", ConsoleCommands.TestAttachTV),
-            new CommandActionWithBlurbAndAction(CommandAction.TestCustomChangeDisplaySettings, "(Test) Custom change display settings", ConsoleCommands.TestCustomChangeDisplaySettings),
             new CommandActionWithBlurbAndAction(CommandAction.TestCCDExampleCodeAll, "(Test) CCD Example Code All Paths", ConsoleCommands.TestCCDExampleCodeAll),
             new CommandActionWithBlurbAndAction(CommandAction.TestCCDExampleCodeOnlyActive, "(Test) CCD Example Code Only Active Paths", ConsoleCommands.TestCCDExampleCodeOnlyActive),
-            new CommandActionWithBlurbAndAction(CommandAction.RecordCurrentDisplayConfigThroughCCD, "Record current display configuration as preset. (CCD)", ConsoleCommands.RecordCurrentDisplayConfigThroughCCD),
-            new CommandActionWithBlurbAndAction(CommandAction.ApplySavedPresetCCD, "Apply saved preset. (CCD)", ConsoleCommands.ApplySavedPresetCCD),
         };
 
         /// <summary>

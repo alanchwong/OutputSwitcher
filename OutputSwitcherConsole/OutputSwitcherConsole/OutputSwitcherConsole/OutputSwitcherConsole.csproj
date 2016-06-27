@@ -46,16 +46,13 @@
     <Compile Include="ConsoleCommandParser.cs" />
     <Compile Include="ConsoleCommands.cs" />
     <Compile Include="ConsoleOutputUtilities.cs" />
-    <Compile Include="Data\DisplayDeviceSettings.cs" />
-    <Compile Include="Data\DisplayDeviceSettingsPersistence.cs" />
     <Compile Include="Data\DisplayPreset.cs" />
     <Compile Include="Data\DisplayPresetCollection.cs" />
+    <Compile Include="Data\DisplayPresetPersistence.cs" />
     <Compile Include="Data\DisplayPresetRecorderAndApplier.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WinAPI\CCD.cs" />
-    <Compile Include="WinAPI\DisplaySettings.cs" />
-    <Compile Include="WinAPI\DisplaySettingsTypes.cs" />
     <Compile Include="WinAPI\Win32Constants.cs" />
     <Compile Include="WinAPI\Win32Utilities.cs" />
     <Compile Include="WinAPI\WindowsTypes.cs" />

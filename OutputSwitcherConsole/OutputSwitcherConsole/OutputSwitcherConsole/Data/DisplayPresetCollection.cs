@@ -35,6 +35,7 @@ namespace OutputSwitcherConsole.Data
             if (!mDisplayPresetDictionary.ContainsKey(preset.Name))
             {
                 mDisplayPresetDictionary.Add(preset.Name, preset);
+                mIsDirty = true;
                 return true;
             }
             else
@@ -53,6 +54,7 @@ namespace OutputSwitcherConsole.Data
             if (mDisplayPresetDictionary.ContainsKey(presetName))
             {
                 mDisplayPresetDictionary.Remove(presetName);
+                mIsDirty = true;
                 return true;
             }
             else
@@ -62,11 +64,14 @@ namespace OutputSwitcherConsole.Data
         }
 
         /// <summary>
-        /// Writes current collection of display presets to disk.
+        /// Writes current collection of display presets to disk if changes have been made.
         /// </summary>
-        public void PersistDisplayPresets()
+        public void PersistDisplayPresetsIfDirty()
         {
-            DisplayDeviceSettingsPersistence.WriteSettings(this.GetPresets());
+            if (mIsDirty)
+            {
+                DisplayPersistence.WriteSettings(this.GetPresets());
+            }
         }
 
         /// <summary>
@@ -103,7 +108,7 @@ namespace OutputSwitcherConsole.Data
             mDisplayPresetDictionary = new Dictionary<string, DisplayPreset>(StringComparer.CurrentCultureIgnoreCase);
 
             // RAII baby, load it up
-            List<DisplayPreset> displayPresets = DisplayDeviceSettingsPersistence.LoadSettings();
+            List<DisplayPreset> displayPresets = DisplayPersistence.LoadSettings();
 
             if (displayPresets != null)
             {
@@ -119,5 +124,11 @@ namespace OutputSwitcherConsole.Data
         // TODO: This might actually be overkill for our purposes.
         // Honestly, how many presets will a user have? A handful.
         private IDictionary<string, DisplayPreset> mDisplayPresetDictionary;
+
+        /// <summary>
+        /// Indicates whether something has changed in the collection that would neccessitate re-writing
+        /// the presets to disk.
+        /// </summary>
+        private bool mIsDirty = false;
     }
 }

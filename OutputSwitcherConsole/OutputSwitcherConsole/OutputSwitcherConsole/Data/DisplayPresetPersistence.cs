@@ -8,7 +8,7 @@ using System.IO;
 
 namespace OutputSwitcherConsole.Data
 {
-    class DisplayDeviceSettingsPersistence
+    class DisplayPersistence
     {
         // TODO: Maybe make this something given to the class instead of hard coded?
         private static readonly string DisplayConfigurationsFilePath =
