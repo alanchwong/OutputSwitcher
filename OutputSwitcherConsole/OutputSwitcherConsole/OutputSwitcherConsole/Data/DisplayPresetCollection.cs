@@ -119,6 +119,14 @@ namespace OutputSwitcherConsole.Data
             }
         }
 
+        /// <summary>
+        /// Persists the collection if necessary when the singleton instance is marked for destruction.
+        /// </summary>
+        ~DisplayPresetCollection()
+        {
+            PersistDisplayPresetsIfDirty();
+        }
+
         private static DisplayPresetCollection mInstance = null;
 
         // TODO: This might actually be overkill for our purposes.

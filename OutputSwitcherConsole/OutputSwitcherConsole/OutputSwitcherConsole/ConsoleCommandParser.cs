@@ -21,6 +21,7 @@ namespace OutputSwitcherConsole
             ApplyPreset,
             TestCCDExampleCodeAll,
             TestCCDExampleCodeOnlyActive,
+            Help,
             Unknown,
         }
 
@@ -53,6 +54,7 @@ namespace OutputSwitcherConsole
             new CommandActionWithBlurbAndAction(CommandAction.CaptureCurrentConfigAndSaveAsPreset, "Capture current display configuration and save as preset.", ConsoleCommands.CaptureCurrentConfigAndSaveAsPreset),
             new CommandActionWithBlurbAndAction(CommandAction.TestCCDExampleCodeAll, "(Test) CCD Example Code All Paths", ConsoleCommands.TestCCDExampleCodeAll),
             new CommandActionWithBlurbAndAction(CommandAction.TestCCDExampleCodeOnlyActive, "(Test) CCD Example Code Only Active Paths", ConsoleCommands.TestCCDExampleCodeOnlyActive),
+            new CommandActionWithBlurbAndAction(CommandAction.Help, "Help.", ConsoleCommands.DisplayHelp),
         };
 
         /// <summary>

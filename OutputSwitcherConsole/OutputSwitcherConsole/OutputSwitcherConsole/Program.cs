@@ -15,6 +15,10 @@ namespace OutputSwitcherConsole
             {
                 ConsoleCommandParser.MainLoop();
             }
+            else
+            {
+                NonInteractiveConsoleCommandParser.ParseCommandLineArgsAndExecute(args);
+            }
         }
     }
 }

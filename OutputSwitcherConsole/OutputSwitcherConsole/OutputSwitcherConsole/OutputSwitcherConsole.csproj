@@ -50,6 +50,8 @@
     <Compile Include="Data\DisplayPresetCollection.cs" />
     <Compile Include="Data\DisplayPresetPersistence.cs" />
     <Compile Include="Data\DisplayPresetRecorderAndApplier.cs" />
+    <Compile Include="NonInteractiveConsoleCommandParser.cs" />
+    <Compile Include="NonInteractiveConsoleCommands.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WinAPI\CCD.cs" />

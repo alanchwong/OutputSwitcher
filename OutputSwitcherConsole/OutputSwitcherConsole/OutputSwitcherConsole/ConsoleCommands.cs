@@ -264,5 +264,10 @@ namespace OutputSwitcherConsole
 
             ConsoleOutputUtilities.WriteDisplayPresetToConsole(selectedPreset);
         }
+
+        static public void DisplayHelp()
+        {
+            NonInteractiveConsoleCommands.DisplayHelp(null);
+        }
     }
 }
