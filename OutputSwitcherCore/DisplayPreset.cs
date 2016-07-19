@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using OutputSwitcherConsole.WinAPI;
+using OutputSwitcher.WinAPI;
 
-namespace OutputSwitcherConsole.Data
+namespace OutputSwitcher.Core
 {
     [Serializable]
     public class DisplayPreset

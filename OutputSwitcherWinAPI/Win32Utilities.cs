@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OutputSwitcherConsole.WinAPI
+namespace OutputSwitcher.WinAPI
 {
-    class Win32Utilities
+    public class Win32Utilities
     {
         /// <summary>
         /// Throws a Win32Exception with the supplied Windows System Error Code if it is not ERROR_SUCCESS.

@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5A9BB596-A98E-4468-B7EA-637447BD0C71}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{164C2B8B-51AF-4B05-BDFF-6341E8B00F92}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OutputSwitcherConsole</RootNamespace>
-    <AssemblyName>OutputSwitcherConsole</AssemblyName>
+    <RootNamespace>OutputSwitcherCore</RootNamespace>
+    <AssemblyName>OutputSwitcherCore</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -43,26 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleCommandParser.cs" />
-    <Compile Include="ConsoleCommands.cs" />
-    <Compile Include="ConsoleOutputUtilities.cs" />
-    <Compile Include="NonInteractiveConsoleCommandParser.cs" />
-    <Compile Include="NonInteractiveConsoleCommands.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="DisplayPreset.cs" />
+    <Compile Include="DisplayPresetCollection.cs" />
+    <Compile Include="DisplayPresetPersistence.cs" />
+    <Compile Include="DisplayPresetRecorderAndApplier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\" />
-    <Folder Include="WinAPI\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OutputSwitcherCore\OutputSwitcherCore.csproj">
-      <Project>{164c2b8b-51af-4b05-bdff-6341e8b00f92}</Project>
-      <Name>OutputSwitcherCore</Name>
-    </ProjectReference>
     <ProjectReference Include="..\OutputSwitcherWinAPI\OutputSwitcherWinAPI.csproj">
       <Project>{ef8afdd0-0f6d-406d-a184-433e2dda28b7}</Project>
       <Name>OutputSwitcherWinAPI</Name>

@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
-using OutputSwitcherConsole.Data;
-using OutputSwitcherConsole.WinAPI;
+using OutputSwitcher.Core;
+using OutputSwitcher.WinAPI;
 
 namespace OutputSwitcherConsole
 {

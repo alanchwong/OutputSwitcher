@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OutputSwitcherConsole.WinAPI
+namespace OutputSwitcher.WinAPI
 {
     class Win32Constants
     {

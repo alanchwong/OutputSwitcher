@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using OutputSwitcherConsole.WinAPI;
+using OutputSwitcher.WinAPI;
 
-namespace OutputSwitcherConsole.Data
+namespace OutputSwitcher.Core
 {
     /// <summary>
     /// Class responsible for recording the current display configuration as a preset, and
     /// applying a saved configuration.
     /// </summary>
-    class DisplayPresetRecorderAndApplier
+    public class DisplayPresetRecorderAndApplier
     {
         /// <summary>
         /// Records the current display configuration as a display preset.

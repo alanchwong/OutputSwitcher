@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.IO;
 
-namespace OutputSwitcherConsole.Data
+namespace OutputSwitcher.Core
 {
-    class DisplayPersistence
+    internal class DisplayPersistence
     {
         // TODO: Maybe make this something given to the class instead of hard coded?
         private static readonly string DisplayConfigurationsFilePath =

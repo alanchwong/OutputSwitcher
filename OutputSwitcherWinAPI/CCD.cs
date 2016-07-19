@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OutputSwitcherConsole.WinAPI
+namespace OutputSwitcher.WinAPI
 {
     public class CCD
     {

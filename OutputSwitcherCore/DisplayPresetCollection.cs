@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OutputSwitcherConsole.Data
+namespace OutputSwitcher.Core
 {
-    class DisplayPresetCollection
+    public class DisplayPresetCollection
     {
         // Responsibilities
         // 1. Load settings from disk into memory
