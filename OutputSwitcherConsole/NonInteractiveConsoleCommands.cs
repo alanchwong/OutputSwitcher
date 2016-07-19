@@ -24,6 +24,12 @@ namespace OutputSwitcherConsole
 
         public static void CaptureCurrentConfigAndSaveAsPreset(string[] args)
         {
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Insufficient arguments.");
+                return;
+            }
+
             // Trim quotes in case the preset name has spaces
             string presetName = args[1].Trim(new char[] { '"', '\'' });
 
@@ -43,6 +49,11 @@ namespace OutputSwitcherConsole
 
         public static void ApplyPreset(string[] args)
         {
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Insufficient arguments.");
+                return;
+            }
 
             // Trim quotes in case the preset name has spaces
             string presetName = args[1].Trim(new char[] { '"', '\'' });

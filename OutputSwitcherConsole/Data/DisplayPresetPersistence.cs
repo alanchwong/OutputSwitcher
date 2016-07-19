@@ -16,7 +16,7 @@ namespace OutputSwitcherConsole.Data
         
         private static readonly string DisplayConfigurationsFullFilename = DisplayConfigurationsFilePath + "\\DisplayConfigurations.xml";
 
-        public static List<DisplayPreset> LoadSettings()
+        public static List<DisplayPreset> LoadPresets()
         {
             List<DisplayPreset> displayPresets = null;
 
@@ -32,7 +32,7 @@ namespace OutputSwitcherConsole.Data
             return displayPresets;
         }
 
-        public static void WriteSettings(List<DisplayPreset> presetCollection)
+        public static void WritePresets(List<DisplayPreset> presetCollection)
         {
             XmlSerializer writer = new XmlSerializer(typeof(List<DisplayPreset>));
 

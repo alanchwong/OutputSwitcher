@@ -14,10 +14,7 @@ namespace OutputSwitcherConsole.Data
         /// <summary>
         /// Creates an empty DisplayPreset. Required for serialization.
         /// </summary>
-        public DisplayPreset()
-        {
-
-        }
+        public DisplayPreset() {}
 
         public DisplayPreset(string name)
         {

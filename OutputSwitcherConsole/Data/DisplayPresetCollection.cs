@@ -70,7 +70,7 @@ namespace OutputSwitcherConsole.Data
         {
             if (mIsDirty)
             {
-                DisplayPersistence.WriteSettings(this.GetPresets());
+                DisplayPersistence.WritePresets(this.GetPresets());
             }
         }
 
@@ -108,7 +108,7 @@ namespace OutputSwitcherConsole.Data
             mDisplayPresetDictionary = new Dictionary<string, DisplayPreset>(StringComparer.CurrentCultureIgnoreCase);
 
             // RAII baby, load it up
-            List<DisplayPreset> displayPresets = DisplayPersistence.LoadSettings();
+            List<DisplayPreset> displayPresets = DisplayPersistence.LoadPresets();
 
             if (displayPresets != null)
             {
