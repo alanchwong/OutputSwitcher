@@ -54,10 +54,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\" />
-    <Folder Include="WinAPI\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\OutputSwitcherCore\OutputSwitcherCore.csproj">
       <Project>{164c2b8b-51af-4b05-bdff-6341e8b00f92}</Project>
