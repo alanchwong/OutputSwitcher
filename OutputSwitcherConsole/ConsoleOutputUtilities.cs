@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using OutputSwitcher.WinAPI;
 using OutputSwitcher.Core;
 
-namespace OutputSwitcherConsole
+namespace OutputSwitcher.ConsoleApp
 {
     class ConsoleOutputUtilities
     {

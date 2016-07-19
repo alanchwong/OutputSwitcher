@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using OutputSwitcher.Core;
 using OutputSwitcher.WinAPI;
 
-namespace OutputSwitcherConsole
+namespace OutputSwitcher.ConsoleApp
 {
     class ConsoleCommands
     {

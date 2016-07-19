@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using OutputSwitcher.Core;
 
-namespace OutputSwitcherConsole
+namespace OutputSwitcher.ConsoleApp
 {
     public class NonInteractiveConsoleCommands
     {
