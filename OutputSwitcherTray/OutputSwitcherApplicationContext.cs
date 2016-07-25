@@ -39,9 +39,9 @@ namespace OutputSwitcher.Tray
                 removePresetDropDownItems.Add(new ToolStripButton(preset.Name, null, RemovePresetDropDown_ItemClicked));
             }
 
-            ToolStripDropDownButton applyPresetDropDownButton = new ToolStripDropDownButton("Apply Preset...", null, applyPresetDropDownItems.ToArray());
-            ToolStripDropDownButton removePresetDropDownButton = new ToolStripDropDownButton("Remove Preset...", null, removePresetDropDownItems.ToArray());
-            
+            ToolStripDropDownButton applyPresetDropDownButton = new ToolStripDropDownButton("Apply display preset...", null, applyPresetDropDownItems.ToArray());
+            ToolStripDropDownButton removePresetDropDownButton = new ToolStripDropDownButton("Remove display preset...", null, removePresetDropDownItems.ToArray());
+
             mAddRemovePresetsToolStripItems = new ToolStripItem[2];
             mAddRemovePresetsToolStripItems[0] = applyPresetDropDownButton;
             mAddRemovePresetsToolStripItems[1] = removePresetDropDownButton;
@@ -50,8 +50,15 @@ namespace OutputSwitcher.Tray
         private void InitializeAfterPresetsToolStripItemCollection()
         {
             mAfterPresetsToolStripItems = new ToolStripItem[2];
-            mAfterPresetsToolStripItems[0] = new ToolStripButton("Capture Current As Preset", null);
+            mAfterPresetsToolStripItems[0] = new ToolStripButton("Capture current display configuration as preset", null);
             mAfterPresetsToolStripItems[1] = new ToolStripButton("Exit", null, ContextMenuStrip_Exit);
+        }
+
+        private void InitializeBeforePresetsToolStripItems()
+        {
+            mBeforePresetsToolStripItems = new ToolStripItem[1];
+            mBeforePresetsToolStripItems[0] = new ToolStripLabel("OutputSwitcher");
+            mBeforePresetsToolStripItems[0].Font = new System.Drawing.Font(mBeforePresetsToolStripItems[0].Font, System.Drawing.FontStyle.Bold);
         }
 
         private void ContextMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
@@ -63,7 +70,14 @@ namespace OutputSwitcher.Tray
                 InitializeAfterPresetsToolStripItemCollection();
             }
 
+            if (mBeforePresetsToolStripItems == null)
+            {
+                InitializeBeforePresetsToolStripItems();
+            }
+
             mNotifyIcon.ContextMenuStrip.Items.Clear();
+            mNotifyIcon.ContextMenuStrip.Items.AddRange(mBeforePresetsToolStripItems);
+            mNotifyIcon.ContextMenuStrip.Items.Add(new ToolStripSeparator());
             mNotifyIcon.ContextMenuStrip.Items.AddRange(mAddRemovePresetsToolStripItems);
             mNotifyIcon.ContextMenuStrip.Items.Add(new ToolStripSeparator());
             mNotifyIcon.ContextMenuStrip.Items.AddRange(mAfterPresetsToolStripItems);
@@ -124,6 +138,7 @@ namespace OutputSwitcher.Tray
         private System.ComponentModel.Container mComponents;
         private NotifyIcon mNotifyIcon;
 
+        private ToolStripItem[] mBeforePresetsToolStripItems;
         private ToolStripItem[] mAddRemovePresetsToolStripItems;
         private ToolStripItem[] mAfterPresetsToolStripItems;
     }
