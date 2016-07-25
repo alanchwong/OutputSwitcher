@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputSwitcherCore", "Outpu
 		{EF8AFDD0-0F6D-406D-A184-433E2DDA28B7} = {EF8AFDD0-0F6D-406D-A184-433E2DDA28B7}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputSwitcherTray", "OutputSwitcherTray\OutputSwitcherTray.csproj", "{4FFD526A-8F40-47C4-8C41-D994BEE9E457}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,10 @@ Global
 		{164C2B8B-51AF-4B05-BDFF-6341E8B00F92}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{164C2B8B-51AF-4B05-BDFF-6341E8B00F92}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{164C2B8B-51AF-4B05-BDFF-6341E8B00F92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FFD526A-8F40-47C4-8C41-D994BEE9E457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FFD526A-8F40-47C4-8C41-D994BEE9E457}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FFD526A-8F40-47C4-8C41-D994BEE9E457}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FFD526A-8F40-47C4-8C41-D994BEE9E457}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
