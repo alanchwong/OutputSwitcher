@@ -24,7 +24,7 @@ namespace OutputSwitcher.Tray
             {
                 if (!mutex.WaitOne(0, false))
                 {
-                    MessageBox.Show("OutputSwitcher already running.");
+                    MessageBox.Show("OutputSwitcher already running.", "OutputSwitcher");
                     return;
                 }
                 else

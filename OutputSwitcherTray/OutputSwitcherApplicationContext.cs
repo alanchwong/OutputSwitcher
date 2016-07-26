@@ -122,8 +122,19 @@ namespace OutputSwitcher.Tray
 
         private void CaptureNewPreset_ItemClicked(object sender, EventArgs e)
         {
-            EnterNewPresetNameForm form = new EnterNewPresetNameForm();
-            form.ShowDialog();
+            if (mEnterNewPresetNameForm == null)
+            {
+                mEnterNewPresetNameForm = new EnterNewPresetNameForm();
+            }
+
+            if (!mEnterNewPresetNameForm.Visible)
+            {
+                mEnterNewPresetNameForm.ShowDialog();
+            }
+            else
+            {
+                mEnterNewPresetNameForm.Activate();
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -145,6 +156,8 @@ namespace OutputSwitcher.Tray
 
         private System.ComponentModel.Container mComponents;
         private NotifyIcon mNotifyIcon;
+
+        private EnterNewPresetNameForm mEnterNewPresetNameForm;
 
         private ToolStripItem[] mBeforePresetsToolStripItems;
         private ToolStripItem[] mAddRemovePresetsToolStripItems;
