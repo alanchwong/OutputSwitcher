@@ -46,9 +46,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EnterNewPresetNameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EnterNewPresetNameForm.Designer.cs">
+      <DependentUpon>EnterNewPresetNameForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="OutputSwitcherApplicationContext.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="EnterNewPresetNameForm.resx">
+      <DependentUpon>EnterNewPresetNameForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

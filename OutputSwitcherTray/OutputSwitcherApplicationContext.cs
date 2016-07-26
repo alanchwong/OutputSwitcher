@@ -50,7 +50,7 @@ namespace OutputSwitcher.Tray
         private void InitializeAfterPresetsToolStripItemCollection()
         {
             mAfterPresetsToolStripItems = new ToolStripItem[2];
-            mAfterPresetsToolStripItems[0] = new ToolStripButton("Capture current display configuration as preset", null);
+            mAfterPresetsToolStripItems[0] = new ToolStripButton("Capture current display configuration as preset", null, CaptureNewPreset_ItemClicked);
             mAfterPresetsToolStripItems[1] = new ToolStripButton("Exit", null, ContextMenuStrip_Exit);
         }
 
@@ -94,6 +94,7 @@ namespace OutputSwitcher.Tray
 
         private void NotifyIcon_DoubleClick(object sender, EventArgs e)
         {
+            mNotifyIcon.ContextMenuStrip.Visible = true;
         }
 
         private void ApplyPresetDropDown_ItemClicked(object sender, EventArgs e)
@@ -118,6 +119,13 @@ namespace OutputSwitcher.Tray
                 DisplayPresetCollection.GetDisplayPresetCollection().TryRemoveDisplayPreset(button.Text);
             }
         }
+
+        private void CaptureNewPreset_ItemClicked(object sender, EventArgs e)
+        {
+            EnterNewPresetNameForm form = new EnterNewPresetNameForm();
+            form.ShowDialog();
+        }
+
         protected override void Dispose(bool disposing)
         {
             // Dispose of any resources that we're holding on to here.
