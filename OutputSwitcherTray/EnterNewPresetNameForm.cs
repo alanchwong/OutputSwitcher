@@ -38,6 +38,11 @@ namespace OutputSwitcher.Tray
             }
         }
 
+        /// <summary>
+        /// Verifies that the input in the textbox is a unique name and is non-empty, calls in to
+        /// OutputSwitcher.Core to create and save the new preset.
+        /// </summary>
+        /// <returns>True if preset created and saved. False if input is invalid or failed to save new preset.</returns>
         private bool TryCreateNewPresetWithEnteredName()
         {
             if (TextboxEnterNewPresetName.Text.Length < 1)
