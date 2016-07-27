@@ -15,6 +15,27 @@ namespace OutputSwitcher.Core
         // 4. Remove existing presets
         // 5. Provide access to the presets in a form that can be consumed by UI
 
+        /// <summary>
+        /// Enumeration indicating the type of change made to the display preset collection.
+        /// </summary>
+        public enum DisplayPresetCollectionChangeType
+        {
+            PresetAdded,
+            PresetRemoved,
+        }
+
+        /// <summary>
+        /// Event handler delegate for the DisplayPresetCollectionChanged event.
+        /// </summary>
+        /// <param name="changeType">The type of change in the collection.</param>
+        /// <param name="presetName">The name of the preset participating in the change.</param>
+        public delegate void DisplayPresetCollectionChangedEventHandler(DisplayPresetCollectionChangeType changeType, string presetName);
+
+        /// <summary>
+        /// Event fired when display preset collection changed.
+        /// </summary>
+        public event DisplayPresetCollectionChangedEventHandler DisplayPresetCollectionChanged;
+
         public static DisplayPresetCollection GetDisplayPresetCollection()
         {
             if (mInstance == null)
@@ -36,6 +57,10 @@ namespace OutputSwitcher.Core
             {
                 mDisplayPresetDictionary.Add(preset.Name, preset);
                 mIsDirty = true;
+
+
+                DisplayPresetCollectionChanged(DisplayPresetCollectionChangeType.PresetAdded, preset.Name);
+
                 return true;
             }
             else
@@ -55,6 +80,9 @@ namespace OutputSwitcher.Core
             {
                 mDisplayPresetDictionary.Remove(presetName);
                 mIsDirty = true;
+
+                DisplayPresetCollectionChanged(DisplayPresetCollectionChangeType.PresetRemoved, presetName);
+
                 return true;
             }
             else
@@ -117,12 +145,25 @@ namespace OutputSwitcher.Core
                     mDisplayPresetDictionary.Add(preset.Name, preset);
                 }
             }
+
+            DisplayPresetCollectionChanged += OnDisplayPresetCollectionChanged;
         }
 
         /// <summary>
         /// Persists the collection if necessary when the singleton instance is marked for destruction.
         /// </summary>
         ~DisplayPresetCollection()
+        {
+            PersistDisplayPresetsIfDirty();
+        }
+
+        /// <summary>
+        /// Internal event handler for handling display preset changes in the in-memory collection. Persists
+        /// changes to disk.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="pn"></param>
+        private void OnDisplayPresetCollectionChanged(DisplayPresetCollectionChangeType c, string pn)
         {
             PersistDisplayPresetsIfDirty();
         }
