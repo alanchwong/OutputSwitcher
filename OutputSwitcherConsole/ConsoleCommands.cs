@@ -17,8 +17,6 @@ namespace OutputSwitcher.ConsoleApp
         /// </summary>
         static public void Exit()
         {
-            DisplayPresetCollection.GetDisplayPresetCollection().PersistDisplayPresetsIfDirty();   // Write to disk before exiting.
-
             Environment.Exit(0);
         }
 

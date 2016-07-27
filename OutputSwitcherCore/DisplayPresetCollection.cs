@@ -56,9 +56,6 @@ namespace OutputSwitcher.Core
             if (!mDisplayPresetDictionary.ContainsKey(preset.Name))
             {
                 mDisplayPresetDictionary.Add(preset.Name, preset);
-                mIsDirty = true;
-
-
                 DisplayPresetCollectionChanged(DisplayPresetCollectionChangeType.PresetAdded, preset.Name);
 
                 return true;
@@ -79,8 +76,6 @@ namespace OutputSwitcher.Core
             if (mDisplayPresetDictionary.ContainsKey(presetName))
             {
                 mDisplayPresetDictionary.Remove(presetName);
-                mIsDirty = true;
-
                 DisplayPresetCollectionChanged(DisplayPresetCollectionChangeType.PresetRemoved, presetName);
 
                 return true;
@@ -94,12 +89,9 @@ namespace OutputSwitcher.Core
         /// <summary>
         /// Writes current collection of display presets to disk if changes have been made.
         /// </summary>
-        public void PersistDisplayPresetsIfDirty()
+        private void PersistDisplayPresets()
         {
-            if (mIsDirty)
-            {
-                DisplayPersistence.WritePresets(this.GetPresets());
-            }
+            DisplayPersistence.WritePresets(this.GetPresets());
         }
 
         /// <summary>
@@ -154,7 +146,7 @@ namespace OutputSwitcher.Core
         /// </summary>
         ~DisplayPresetCollection()
         {
-            PersistDisplayPresetsIfDirty();
+            PersistDisplayPresets();
         }
 
         /// <summary>
@@ -165,7 +157,7 @@ namespace OutputSwitcher.Core
         /// <param name="pn"></param>
         private void OnDisplayPresetCollectionChanged(DisplayPresetCollectionChangeType c, string pn)
         {
-            PersistDisplayPresetsIfDirty();
+            PersistDisplayPresets();
         }
 
         private static DisplayPresetCollection mInstance = null;
@@ -173,11 +165,5 @@ namespace OutputSwitcher.Core
         // TODO: This might actually be overkill for our purposes.
         // Honestly, how many presets will a user have? A handful.
         private IDictionary<string, DisplayPreset> mDisplayPresetDictionary;
-
-        /// <summary>
-        /// Indicates whether something has changed in the collection that would neccessitate re-writing
-        /// the presets to disk.
-        /// </summary>
-        private bool mIsDirty = false;
     }
 }
