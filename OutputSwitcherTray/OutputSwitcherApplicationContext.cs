@@ -22,93 +22,50 @@ namespace OutputSwitcher.Tray
                 Visible = true,
             };
 
-            mNotifyIcon.ContextMenuStrip.Opening += ContextMenuStrip_Opening;
             mNotifyIcon.DoubleClick += NotifyIcon_DoubleClick;
+
+            InitializeContextMenu();
         }
 
-        /// <summary>
-        /// Populates the apply and remove preset drop down menus with the latest set of
-        /// presets available in the DisplayPresetCollection.
-        /// </summary>
-        private void InitializePresetsToolStripItemCollection()
+        private void InitializeContextMenu()
         {
+            ToolStripItem[] afterPresetsToolStripItems = new ToolStripItem[2];
+            afterPresetsToolStripItems[0] = new ToolStripButton("Capture current display configuration as preset", null, CaptureNewPreset_ItemClicked);
+            afterPresetsToolStripItems[1] = new ToolStripButton("Exit", null, ContextMenuStrip_Exit);
+
             List<DisplayPreset> displayPresets = DisplayPresetCollection.GetDisplayPresetCollection().GetPresets();
 
-            List<ToolStripItem> applyPresetDropDownItems = new List<ToolStripItem>();
-            List<ToolStripItem> removePresetDropDownItems = new List<ToolStripItem>();
+            List<PresetContextMenuItem> applyPresetDropDownItems = new List<PresetContextMenuItem>();
+            List<PresetContextMenuItem> removePresetDropDownItems = new List<PresetContextMenuItem>();
 
             foreach (DisplayPreset preset in displayPresets)
             {
-                applyPresetDropDownItems.Add(new ToolStripButton(preset.Name, null, ApplyPresetDropDown_ItemClicked));
-                removePresetDropDownItems.Add(new ToolStripButton(preset.Name, null, RemovePresetDropDown_ItemClicked));
+                applyPresetDropDownItems.Add(new PresetContextMenuItem(preset.Name, ApplyPresetDropDown_ItemClicked));
+                removePresetDropDownItems.Add(new PresetContextMenuItem(preset.Name, RemovePresetDropDown_ItemClicked));
             }
 
-            ToolStripDropDownButton applyPresetDropDownButton = new ToolStripDropDownButton("Apply display preset...", null, applyPresetDropDownItems.ToArray());
-            ToolStripDropDownButton removePresetDropDownButton = new ToolStripDropDownButton("Remove display preset...", null, removePresetDropDownItems.ToArray());
+            applyPresetDropDownButton = new ToolStripDropDownButton("Apply display preset...", null, applyPresetDropDownItems.ToArray());
+            removePresetDropDownButton = new ToolStripDropDownButton("Remove display preset...", null, removePresetDropDownItems.ToArray());
 
-            mAddRemovePresetsToolStripItems = new ToolStripItem[2];
+            ToolStripItem[] mAddRemovePresetsToolStripItems = new ToolStripItem[2];
             mAddRemovePresetsToolStripItems[0] = applyPresetDropDownButton;
             mAddRemovePresetsToolStripItems[1] = removePresetDropDownButton;
-        }
 
-        /// <summary>
-        /// Creates the set of context menu items that come after the apply/remove preset drop downs.
-        /// </summary>
-        private void InitializeAfterPresetsToolStripItemCollection()
-        {
-            mAfterPresetsToolStripItems = new ToolStripItem[2];
-            mAfterPresetsToolStripItems[0] = new ToolStripButton("Capture current display configuration as preset", null, CaptureNewPreset_ItemClicked);
-            mAfterPresetsToolStripItems[1] = new ToolStripButton("Exit", null, ContextMenuStrip_Exit);
-        }
-
-        /// <summary>
-        /// Creates the set of context emnu items that come before the apple/remove preset drop downs.
-        /// </summary>
-        private void InitializeBeforePresetsToolStripItems()
-        {
-            mBeforePresetsToolStripItems = new ToolStripItem[1];
-            mBeforePresetsToolStripItems[0] = new ToolStripLabel("OutputSwitcher");
-            mBeforePresetsToolStripItems[0].Font = new System.Drawing.Font(mBeforePresetsToolStripItems[0].Font, System.Drawing.FontStyle.Bold);
-        }
-
-        /// <summary>
-        /// Event handler for the NotifyIcon's context menu strip opening. Populates the context menu with 
-        /// the menu items as it opens.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ContextMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            /* This is not the most efficient way to do this. We shouldn't throw out menu items every
-             * time even if they haven't changed. A quick test shows that until the garbage collector
-             * runs the app starts eating up more memory each time the context menu is opened. Sure,
-             * it's a small amount but that's still no good. Should have a way to detect changes in
-             * the DisplayPresetCollection such that we only regenerate items when that collection
-             * changes.
-             */
-
-            InitializePresetsToolStripItemCollection();
-
-            if (mAfterPresetsToolStripItems == null)
-            {
-                InitializeAfterPresetsToolStripItemCollection();
-            }
-
-            if (mBeforePresetsToolStripItems == null)
-            {
-                InitializeBeforePresetsToolStripItems();
-            }
+            ToolStripItem[] beforePresetsToolStripItems = new ToolStripItem[1];
+            beforePresetsToolStripItems[0] = new ToolStripLabel("OutputSwitcher");
+            beforePresetsToolStripItems[0].Font = new System.Drawing.Font(beforePresetsToolStripItems[0].Font, System.Drawing.FontStyle.Bold);
 
             mNotifyIcon.ContextMenuStrip.Items.Clear();
-            mNotifyIcon.ContextMenuStrip.Items.AddRange(mBeforePresetsToolStripItems);
+            mNotifyIcon.ContextMenuStrip.Items.AddRange(beforePresetsToolStripItems);
             mNotifyIcon.ContextMenuStrip.Items.Add(new ToolStripSeparator());
             mNotifyIcon.ContextMenuStrip.Items.AddRange(mAddRemovePresetsToolStripItems);
             mNotifyIcon.ContextMenuStrip.Items.Add(new ToolStripSeparator());
-            mNotifyIcon.ContextMenuStrip.Items.AddRange(mAfterPresetsToolStripItems);
+            mNotifyIcon.ContextMenuStrip.Items.AddRange(afterPresetsToolStripItems);
 
             mNotifyIcon.ContextMenuStrip.PerformLayout();
 
-            e.Cancel = false;
+            DisplayPresetCollection.GetDisplayPresetCollection().DisplayPresetCollectionChanged += OnDisplayPresetCollectionChanged;
+
         }
 
         /// <summary>
@@ -190,6 +147,54 @@ namespace OutputSwitcher.Tray
         }
 
         /// <summary>
+        /// Event handler for when display preset collection changes and we need to update the context menu
+        /// items containing the presets that are available for apply/remove.
+        /// </summary>
+        /// <param name="changeType">The type of collection change.</param>
+        /// <param name="presetName">The name of the preset added or removed.</param>
+        private void OnDisplayPresetCollectionChanged(DisplayPresetCollection.DisplayPresetCollectionChangeType changeType, string presetName)
+        {
+            if (changeType == DisplayPresetCollection.DisplayPresetCollectionChangeType.PresetAdded)
+            {
+                applyPresetDropDownButton.DropDown.Items.Add(new PresetContextMenuItem(presetName, ApplyPresetDropDown_ItemClicked));
+                removePresetDropDownButton.DropDown.Items.Add(new PresetContextMenuItem(presetName, RemovePresetDropDown_ItemClicked));
+            }
+            else
+            {
+                int applyIndex = 0;
+                int removeIndex = 0;
+
+                foreach (ToolStripItem menuItem in applyPresetDropDownButton.DropDown.Items)
+                {
+                    PresetContextMenuItem presetItem = menuItem as PresetContextMenuItem;
+
+                    if (presetItem != null && presetItem.PresetName.Equals(presetName))
+                    {
+                        applyPresetDropDownButton.DropDown.Items.RemoveAt(applyIndex);
+                        break;
+                    }
+
+                    applyIndex++;
+                }
+
+                foreach (PresetContextMenuItem menuItem in removePresetDropDownButton.DropDown.Items)
+                {
+                    PresetContextMenuItem presetItem = menuItem as PresetContextMenuItem;
+
+                    if (presetItem != null && presetItem.PresetName.Equals(presetName))
+                    {
+                        removePresetDropDownButton.DropDown.Items.RemoveAt(removeIndex);
+                        break;
+                    }
+
+                    removeIndex++;
+                }
+            }
+
+            mNotifyIcon.ContextMenuStrip.PerformLayout();   // Refresh the layout
+        }
+
+        /// <summary>
         /// Called by the public Dispose() method as part of terminating the thread. Disposes
         /// of resources held by this instance.
         /// </summary>
@@ -219,8 +224,7 @@ namespace OutputSwitcher.Tray
 
         private EnterNewPresetNameForm mEnterNewPresetNameForm;
 
-        private ToolStripItem[] mBeforePresetsToolStripItems;
-        private ToolStripItem[] mAddRemovePresetsToolStripItems;
-        private ToolStripItem[] mAfterPresetsToolStripItems;
+        private ToolStripDropDownButton applyPresetDropDownButton;
+        private ToolStripDropDownButton removePresetDropDownButton;
     }
 }
