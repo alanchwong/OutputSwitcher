@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace OutputSwitcher.WinAPI
 {
+    // This wasn't available on PInvoke.net, so these wrappers are adapted from
+    // http://stackoverflow.com/questions/16082330/communicating-with-windows7-display-api
+    // Additions made to support Windows 8.1+ enhancements to the API, and to support
+    // XML serialization.
+
     public class CCD
     {
         public enum DisplayConfigVideoOutputTechnology : uint
@@ -581,6 +586,9 @@ namespace OutputSwitcher.WinAPI
         private static extern int DisplayConfigGetDeviceInfo(IntPtr requestPacket);
         public static int DisplayConfigGetDeviceInfo<T>(ref T displayConfig) where T : IDisplayConfigInfo
         {
+            // Pretty nifty solution here from:
+            // http://stackoverflow.com/questions/16123108/how-can-i-p-invoke-a-function-with-a-parameter-that-can-accept-many-different-ty
+
             // Allocate unmanaged memory in the size of the supplied IDisplayConfigInfo struct.
             IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(displayConfig));
 
