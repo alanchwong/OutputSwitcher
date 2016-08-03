@@ -24,13 +24,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -51,6 +52,9 @@
     </Compile>
     <Compile Include="EnterNewPresetNameForm.Designer.cs">
       <DependentUpon>EnterNewPresetNameForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NoPresetPresetContextMenuItem.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="OutputSwitcherApplicationContext.cs" />
     <Compile Include="PresetContextMenuItem.cs">

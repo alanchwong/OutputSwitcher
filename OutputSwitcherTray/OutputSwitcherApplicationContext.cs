@@ -38,13 +38,21 @@ namespace OutputSwitcher.TrayApp
 
             List<DisplayPreset> displayPresets = DisplayPresetCollection.GetDisplayPresetCollection().GetPresets();
 
-            List<PresetContextMenuItem> applyPresetDropDownItems = new List<PresetContextMenuItem>();
-            List<PresetContextMenuItem> removePresetDropDownItems = new List<PresetContextMenuItem>();
+            List<ToolStripItem> applyPresetDropDownItems = new List<ToolStripItem>();
+            List<ToolStripItem> removePresetDropDownItems = new List<ToolStripItem>();
 
-            foreach (DisplayPreset preset in displayPresets)
+            if (displayPresets.Count > 0)
             {
-                applyPresetDropDownItems.Add(new PresetContextMenuItem(preset.Name, ApplyPresetDropDown_ItemClicked));
-                removePresetDropDownItems.Add(new PresetContextMenuItem(preset.Name, RemovePresetDropDown_ItemClicked));
+                foreach (DisplayPreset preset in displayPresets)
+                {
+                    applyPresetDropDownItems.Add(new PresetContextMenuItem(preset.Name, ApplyPresetDropDown_ItemClicked));
+                    removePresetDropDownItems.Add(new PresetContextMenuItem(preset.Name, RemovePresetDropDown_ItemClicked));
+                }
+            }
+            else
+            {
+                applyPresetDropDownItems.Add(new NoPresetPresetContextMenuItem());
+                removePresetDropDownItems.Add(new NoPresetPresetContextMenuItem());
             }
 
             applyPresetDropDownButton = new ToolStripDropDownButton("Apply display preset...", null, applyPresetDropDownItems.ToArray());
@@ -90,7 +98,8 @@ namespace OutputSwitcher.TrayApp
         /// <param name="e"></param>
         private void NotifyIcon_DoubleClick(object sender, EventArgs e)
         {
-            mNotifyIcon.ContextMenuStrip.Visible = true;
+            mNotifyIcon.ContextMenuStrip.Show();
+            mNotifyIcon.ContextMenuStrip.Focus();
         }
 
         /// <summary>
@@ -164,6 +173,19 @@ namespace OutputSwitcher.TrayApp
         {
             if (changeType == DisplayPresetCollection.DisplayPresetCollectionChangeType.PresetAdded)
             {
+                // If this is the first new preset added, remove the "None" disabled items.
+                if (applyPresetDropDownButton.DropDown.Items.Count == 1 &&
+                    applyPresetDropDownButton.DropDown.Items[0] is NoPresetPresetContextMenuItem)
+                {
+                    applyPresetDropDownButton.DropDown.Items.RemoveAt(0);
+                }
+
+                if (removePresetDropDownButton.DropDown.Items.Count == 1 &&
+                    removePresetDropDownButton.DropDown.Items[0] is NoPresetPresetContextMenuItem)
+                {
+                    removePresetDropDownButton.DropDown.Items.RemoveAt(0);
+                }
+
                 applyPresetDropDownButton.DropDown.Items.Add(new PresetContextMenuItem(presetName, ApplyPresetDropDown_ItemClicked));
                 removePresetDropDownButton.DropDown.Items.Add(new PresetContextMenuItem(presetName, RemovePresetDropDown_ItemClicked));
             }
@@ -197,8 +219,21 @@ namespace OutputSwitcher.TrayApp
 
                     removeIndex++;
                 }
+
+                // If all presets have been removed, place the "None" disabled menu item back into the drop down.
+                if (applyPresetDropDownButton.DropDown.Items.Count == 0)
+                {
+                    applyPresetDropDownButton.DropDown.Items.Add(new NoPresetPresetContextMenuItem());
+                }
+
+                if (removePresetDropDownButton.DropDown.Items.Count == 0)
+                {
+                    removePresetDropDownButton.DropDown.Items.Add(new NoPresetPresetContextMenuItem());
+                }
             }
 
+            applyPresetDropDownButton.DropDown.PerformLayout();
+            removePresetDropDownButton.DropDown.PerformLayout();
             mNotifyIcon.ContextMenuStrip.PerformLayout();   // Refresh the layout
         }
 
