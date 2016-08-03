@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace OutputSwitcher.Tray
+namespace OutputSwitcher.TrayApp
 {
     static class Program
     {
@@ -29,7 +29,7 @@ namespace OutputSwitcher.Tray
                 }
                 else
                 {
-                    Application.Run(new OutputSwitcher.Tray.OutputSwitcherApplicationContext());
+                    Application.Run(new OutputSwitcher.TrayApp.OutputSwitcherApplicationContext());
                 }
             }
         }

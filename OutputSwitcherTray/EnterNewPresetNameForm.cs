@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 using OutputSwitcher.Core;
 
-namespace OutputSwitcher.Tray
+namespace OutputSwitcher.TrayApp
 {
     public partial class EnterNewPresetNameForm : Form
     {

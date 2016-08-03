@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using System.Windows.Forms;
 
-namespace OutputSwitcher.Tray
+namespace OutputSwitcher.TrayApp
 {
     internal class PresetContextMenuItem : ToolStripButton, IComparable<PresetContextMenuItem>
     {

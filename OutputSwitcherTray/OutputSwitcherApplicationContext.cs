@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 using OutputSwitcher.Core;
 
-namespace OutputSwitcher.Tray
+namespace OutputSwitcher.TrayApp
 {
     public class OutputSwitcherApplicationContext : ApplicationContext
     {
@@ -27,6 +27,9 @@ namespace OutputSwitcher.Tray
             InitializeContextMenu();
         }
 
+        /// <summary>
+        /// Creates the app's context menu items.
+        /// </summary>
         private void InitializeContextMenu()
         {
             ToolStripItem[] afterPresetsToolStripItems = new ToolStripItem[2];
@@ -102,8 +105,15 @@ namespace OutputSwitcher.Tray
             // The ToolStripButton's text is the name of the preset -- TODO: should actually encapsulate this in a subclass.
             if (button != null)
             {
-                DisplayPresetRecorderAndApplier.ApplyPreset(
-                    DisplayPresetCollection.GetDisplayPresetCollection().GetPreset(button.Text));
+                DisplayPreset lastConfig = 
+                    DisplayPresetRecorderAndApplier.ReturnLastConfigAndApplyPreset(
+                        DisplayPresetCollection.GetDisplayPresetCollection().GetPreset(button.Text));
+
+                // Pop up a dialog to give user the option to keep the configuration or else
+                // automatically revert to the last configuration.
+                // TODO: This seems weird to pass control away like this.
+                UseAppliedPresetCountdownForm revertPresetCountdownForm = new UseAppliedPresetCountdownForm(lastConfig);
+                revertPresetCountdownForm.Show();
             }
         }
 

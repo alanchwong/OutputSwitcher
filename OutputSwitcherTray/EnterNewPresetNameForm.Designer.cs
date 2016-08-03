@@ -1,4 +1,4 @@
-﻿namespace OutputSwitcher.Tray
+﻿namespace OutputSwitcher.TrayApp
 {
     partial class EnterNewPresetNameForm
     {
@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EnterNewPresetNameForm));
             this.TextboxEnterNewPresetName = new System.Windows.Forms.TextBox();
             this.LabelEnterNewPresetName = new System.Windows.Forms.Label();
             this.ButtonOK = new System.Windows.Forms.Button();
@@ -79,6 +80,8 @@
             this.Controls.Add(this.ButtonOK);
             this.Controls.Add(this.LabelEnterNewPresetName);
             this.Controls.Add(this.TextboxEnterNewPresetName);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "EnterNewPresetNameForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

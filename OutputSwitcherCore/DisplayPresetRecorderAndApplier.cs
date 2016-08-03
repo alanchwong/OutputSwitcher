@@ -81,6 +81,26 @@ namespace OutputSwitcher.Core
                     displayPreset.ModeInfoArray,
                     CCD.SdcFlags.Apply | CCD.SdcFlags.UseSuppliedDisplayConfig | CCD.SdcFlags.AllowChanges | CCD.SdcFlags.SaveToDatabase));
         }
+        
+        /// <summary>
+        /// Applies the supplied display preset to the system and dynamically switches to it. Returns the
+        /// display configuration in use before the new preset is applied as a DisplayPreset. This allows
+        /// consumers to switch back to that last configuration if needed. Throws exception if failed to
+        /// capture current configuration, or if failed to apply supplied preset configuration.
+        /// </summary>
+        /// <param name="displayPreset">The display configuration to switch to.</param>
+        /// <returns>The display configuration in use before the supplied preset is applied. The name of
+        /// the preset will be a GUID.</returns>
+        static public DisplayPreset ReturnLastConfigAndApplyPreset(DisplayPreset displayPreset)
+        {
+            Guid guid = Guid.NewGuid();
+
+            DisplayPreset currentConfig = RecordCurrentConfiguration(guid.ToString());
+
+            ApplyPreset(displayPreset);
+
+            return currentConfig;
+        }
 
         /// <summary>
         /// Gets the display target name.
