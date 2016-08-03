@@ -100,14 +100,13 @@ namespace OutputSwitcher.TrayApp
         /// <param name="e"></param>
         private void ApplyPresetDropDown_ItemClicked(object sender, EventArgs e)
         {
-            ToolStripButton button = sender as ToolStripButton;
+            PresetContextMenuItem presetContextMenuItem = sender as PresetContextMenuItem;
 
-            // The ToolStripButton's text is the name of the preset -- TODO: should actually encapsulate this in a subclass.
-            if (button != null)
+            if (presetContextMenuItem != null)
             {
                 DisplayPreset lastConfig = 
                     DisplayPresetRecorderAndApplier.ReturnLastConfigAndApplyPreset(
-                        DisplayPresetCollection.GetDisplayPresetCollection().GetPreset(button.Text));
+                        DisplayPresetCollection.GetDisplayPresetCollection().GetPreset(presetContextMenuItem.PresetName));
 
                 // Pop up a dialog to give user the option to keep the configuration or else
                 // automatically revert to the last configuration.
@@ -124,12 +123,11 @@ namespace OutputSwitcher.TrayApp
         /// <param name="e"></param>
         private void RemovePresetDropDown_ItemClicked(object sender, EventArgs e)
         {
-            ToolStripButton button = sender as ToolStripButton;
+            PresetContextMenuItem presetContextMenuItem = sender as PresetContextMenuItem;
 
-            // The ToolStripButton's text is the name of the preset -- TODO: should actually encapsulate this in a subclass.
-            if (button != null)
+            if (presetContextMenuItem != null)
             {
-                DisplayPresetCollection.GetDisplayPresetCollection().TryRemoveDisplayPreset(button.Text);
+                DisplayPresetCollection.GetDisplayPresetCollection().TryRemoveDisplayPreset(presetContextMenuItem.PresetName);
             }
         }
 
