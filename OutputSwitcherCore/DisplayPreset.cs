@@ -51,5 +51,10 @@ namespace OutputSwitcher.Core
         {
             get; set;
         }
+
+        public CCD.DisplayConfigAdapterName[] AdapterNames
+        {
+            get; set;
+        }
     }
 }

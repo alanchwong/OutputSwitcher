@@ -206,6 +206,18 @@ namespace OutputSwitcher.ConsoleApp
 
             Win32Utilities.ThrowIfResultCodeNotSuccess(resultCode);
 
+            ConsoleOutputUtilities.WriteDisplayConfigSourceDeviceNameToConsole(dcSourceDeviceName);
+
+            CCD.DisplayConfigAdapterName dcAdapterName = new CCD.DisplayConfigAdapterName();
+            dcAdapterName.header.type = CCD.DisplayConfigDeviceInfoType.GetAdapterName;
+            dcAdapterName.header.size = (uint)Marshal.SizeOf(dcAdapterName);
+            dcAdapterName.header.adapterId = primaryPath.sourceInfo.adapterId;
+
+            Win32Utilities.ThrowIfResultCodeNotSuccess(
+                CCD.DisplayConfigGetDeviceInfo(ref dcAdapterName));
+
+            ConsoleOutputUtilities.WriteDisplayConfigAdapterNameToConsole(dcAdapterName);
+
             CCD.DisplayConfigTargetPreferredMode dcTargetPreferredMode = new CCD.DisplayConfigTargetPreferredMode();
             dcTargetPreferredMode.header.type = CCD.DisplayConfigDeviceInfoType.GetTargetPreferredMode;
             dcTargetPreferredMode.header.size = (uint)Marshal.SizeOf(dcTargetPreferredMode);

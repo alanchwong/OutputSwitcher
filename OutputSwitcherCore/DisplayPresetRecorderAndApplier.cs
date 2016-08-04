@@ -54,6 +54,8 @@ namespace OutputSwitcher.Core
             displayPreset.PathInfoArray = pathInfoArray;
             displayPreset.ModeInfoArray = modeInfoArray;
 
+            // Save the Target Device Name structs to log the monitor output devices. This isn't
+            // actually used for anything but makes the XML output more readable.
             CCD.DisplayConfigTargetDeviceName[] targetDeviceNameArray = new CCD.DisplayConfigTargetDeviceName[pathInfoArray.Length];
 
             for (int i = 0; i < pathInfoArray.Length; i++)
@@ -62,6 +64,34 @@ namespace OutputSwitcher.Core
             }
 
             displayPreset.TargetDeviceNames = targetDeviceNameArray;
+
+            // Save the Adapter Name structs. The adapter ID values may change on reboot, as they
+            // appear to simply be a logical, run-time value rather than a persistent identifier.
+            // So we save the Adapter Name structs to log a device name that the adapter ID maps to. 
+            // We can use this to update the adapter IDs we save in our presets such that the presets
+            // will still be usable after a reboot. Otherwise, when the machine is rebooted and the
+            // user tries to apply a saved preset, the API call will fail because the adapter ID has
+            // changed.
+            Dictionary<CCD.LUID, CCD.DisplayConfigAdapterName> adapterIdToAdapterName = new Dictionary<CCD.LUID, CCD.DisplayConfigAdapterName>();
+
+            // Find all the unique adapter IDs used in the active paths and capture the display adapter
+            // device names that those IDs map to.
+            foreach (CCD.DisplayConfigPathInfo pathInfo in pathInfoArray)
+            {
+                if (!adapterIdToAdapterName.ContainsKey(pathInfo.sourceInfo.adapterId))
+                {
+                    CCD.DisplayConfigAdapterName adapterName = new CCD.DisplayConfigAdapterName();
+                    adapterName.header.adapterId = pathInfo.sourceInfo.adapterId;
+                    adapterName.header.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(adapterName);
+                    adapterName.header.type = CCD.DisplayConfigDeviceInfoType.GetAdapterName;
+
+                    Win32Utilities.ThrowIfResultCodeNotSuccess(CCD.DisplayConfigGetDeviceInfo(ref adapterName));
+
+                    adapterIdToAdapterName.Add(adapterName.header.adapterId, adapterName);
+                }
+            }
+
+            displayPreset.AdapterNames = adapterIdToAdapterName.Values.ToArray();
 
             return displayPreset;
         }

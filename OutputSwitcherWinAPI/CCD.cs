@@ -149,6 +149,29 @@ namespace OutputSwitcher.WinAPI
             {
                 return "High: " + HighPart + ", Low: " + LowPart;
             }
+
+            public override bool Equals(object other)
+            {
+                if (other != null && other is LUID)
+                {
+                    return (LowPart == ((LUID)other).LowPart) && (HighPart == ((LUID)other).HighPart);
+                }
+                else
+                {
+                    return base.Equals(other);
+                }
+            }
+
+            public override int GetHashCode()
+            {
+                // The hash is the beginning of checking for equality, and LUID is
+                // basically a 64-bit int value. So the hash code should *suggest* potential
+                // equality between two LUID structs if their HighPart and LowPart hash to the
+                // same values. And it should be dependent on the LowPart and HighPart because
+                // that's what matters. These are value types, not reference types. Soooo I
+                // think this is okay.
+                return (int)(HighPart & LowPart);
+            }
         }
 
         [Flags]
@@ -547,6 +570,17 @@ namespace OutputSwitcher.WinAPI
             public UInt32 width;
             public UInt32 height;
             public DisplayConfigTargetMode targetMode;
+        }
+
+        [Serializable]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct DisplayConfigAdapterName : IDisplayConfigInfo
+        {
+            public DisplayConfigDeviceInfoHeader header;
+
+            // Underlying type is fixd length WCHAR array
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            public string adapterDevicePath;
         }
 
         #endregion

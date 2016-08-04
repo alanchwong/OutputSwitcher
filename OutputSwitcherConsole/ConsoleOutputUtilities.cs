@@ -185,5 +185,19 @@ namespace OutputSwitcher.ConsoleApp
             Console.WriteLine("Monitor Friendly Name: " + targetDeviceName.monitorFriendlyDeviceName);
             Console.WriteLine("Monitor Device Path: " + targetDeviceName.monitorDevicePath);
         }
+
+        static public void WriteDisplayConfigSourceDeviceNameToConsole(CCD.DisplayConfigSourceDeviceName sourceDeviceName)
+        {
+            WriteDisplayConfigDeviceInfoHeader(sourceDeviceName.header);
+
+            Console.WriteLine("GDI Device Name: " + sourceDeviceName.viewGdiDeviceName);
+        }
+
+        static public void WriteDisplayConfigAdapterNameToConsole(CCD.DisplayConfigAdapterName adapterName)
+        {
+            WriteDisplayConfigDeviceInfoHeader(adapterName.header);
+
+            Console.WriteLine("Adapter Device Path: " + adapterName.adapterDevicePath);
+        }
     }
 }
