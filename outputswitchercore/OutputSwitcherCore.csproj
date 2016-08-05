@@ -7,7 +7,7 @@
     <ProjectGuid>{164C2B8B-51AF-4B05-BDFF-6341E8B00F92}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OutputSwitcherCore</RootNamespace>
+    <RootNamespace>OutputSwitcher.Core</RootNamespace>
     <AssemblyName>OutputSwitcherCore</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdapterIdMapper.cs" />
     <Compile Include="DisplayPreset.cs" />
     <Compile Include="DisplayPresetCollection.cs" />
     <Compile Include="DisplayPresetPersistence.cs" />
