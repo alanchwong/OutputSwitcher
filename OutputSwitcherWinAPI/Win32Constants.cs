@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OutputSwitcher.WinAPI
 {
-    class Win32Constants
+    public class Win32Constants
     {
         /// <summary>
         /// Windows system error code 0x0 ERROR_SUCCESS.

@@ -103,12 +103,38 @@ namespace OutputSwitcher.Core
         /// <param name="displayPreset">The display preset to apply.</param>
         static public void ApplyPreset(DisplayPreset displayPreset)
         {
+            AdapterIdMapper.DisplayPresetAdapterIdValidation validationResult =
+                AdapterIdMapper.GetAdapterIdMapper().ValidateDisplayPresetAdapterIds(displayPreset);
+
+            CCD.DisplayConfigPathInfo[] pathInfoArrayToApply = displayPreset.PathInfoArray;
+            CCD.DisplayConfigModeInfo[] modeInfoArrayToApply = displayPreset.ModeInfoArray;
+
+            if (validationResult == AdapterIdMapper.DisplayPresetAdapterIdValidation.NeedAdapterIdRemap)
+            {
+                pathInfoArrayToApply = displayPreset.PathInfoArray;
+                modeInfoArrayToApply = displayPreset.ModeInfoArray;
+
+                // TODO: The remap methods return a boolean, though it sorta doesn't matter for us since
+                // we've already done validation. It's the right design that those methods return a
+                // boolean, so maybe we should put an assert here?
+                AdapterIdMapper.GetAdapterIdMapper().RemapDisplayConfigPathInfoAdapterIds(displayPreset, ref pathInfoArrayToApply);
+                AdapterIdMapper.GetAdapterIdMapper().RemapDisplayConfigModeInfoAdapterIds(displayPreset, ref modeInfoArrayToApply);
+            }
+            else if (validationResult == AdapterIdMapper.DisplayPresetAdapterIdValidation.MissingAdapter)
+            {
+                // TODO: Have better interface for handling this case, cuz it's a real case where someone
+                // upgrades a video card for example.
+                throw new Exception("Missing adapter! Can't apply preset.");
+            }
+
+            // Third validation result case is that all the adapter IDs are still valid and map correctly, so no action required.
+
             Win32Utilities.ThrowIfResultCodeNotSuccess(
                 CCD.SetDisplayConfig(
-                    (uint)displayPreset.PathInfoArray.Length,
-                    displayPreset.PathInfoArray,
-                    (uint)displayPreset.ModeInfoArray.Length,
-                    displayPreset.ModeInfoArray,
+                    (uint)pathInfoArrayToApply.Length,
+                    pathInfoArrayToApply,
+                    (uint)modeInfoArrayToApply.Length,
+                    modeInfoArrayToApply,
                     CCD.SdcFlags.Apply | CCD.SdcFlags.UseSuppliedDisplayConfig | CCD.SdcFlags.AllowChanges | CCD.SdcFlags.SaveToDatabase));
         }
         
