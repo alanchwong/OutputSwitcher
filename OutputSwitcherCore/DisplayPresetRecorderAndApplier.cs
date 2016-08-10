@@ -126,6 +126,11 @@ namespace OutputSwitcher.Core
                 // upgrades a video card for example.
                 throw new Exception("Missing adapter! Can't apply preset.");
             }
+            else if (validationResult == AdapterIdMapper.DisplayPresetAdapterIdValidation.DisplayPresetMissingAdapterInformation)
+            {
+                // TODO: Handle this better, basically case where schema change
+                throw new Exception("Display Preset is missing adapter name information.");
+            }
 
             // Third validation result case is that all the adapter IDs are still valid and map correctly, so no action required.
 

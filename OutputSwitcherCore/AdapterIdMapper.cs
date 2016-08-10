@@ -11,6 +11,10 @@ namespace OutputSwitcher.Core
 {
     public class AdapterIdMapper
     {
+        /// <summary>
+        /// Specifies the validation result when checking a DisplayPreset's saved
+        /// Adapter IDs to the Adapter IDs currently in use by Windows.
+        /// </summary>
         public enum DisplayPresetAdapterIdValidation
         {
             /// <summary>
@@ -34,8 +38,18 @@ namespace OutputSwitcher.Core
             /// the DisplayPreset unusable.
             /// </summary>
             MissingAdapter,
+
+            /// <summary>
+            /// DisplayPreset does not have valid adapter name information saved that
+            /// maps its adapter IDs to device names.
+            /// </summary>
+            DisplayPresetMissingAdapterInformation,
         }
 
+        /// <summary>
+        /// Retrieves the singleton instance of AdapterIdMapper.
+        /// </summary>
+        /// <returns>The singleton instance of AdapterIdMapper.</returns>
         public static AdapterIdMapper GetAdapterIdMapper()
         {
             if (mInstance == null)
@@ -44,31 +58,54 @@ namespace OutputSwitcher.Core
             return mInstance;
         }
 
+        /// <summary>
+        /// Retrieves the Adapter ID currently in use by Windows to identify the supplied display
+        /// adapter device path name.
+        /// </summary>
+        /// <param name="displayAdapterDevicePath">The display adapter device path name, as returned from 
+        ///     from a DisplayConfigGetDeviceInfo API call with a DisplayConfigAdapterName struct.</param>
+        /// <param name="adapterId">The current LUID adapter ID identifying that device.</param>
+        /// <returns>True if the supplied adapter device name is available and functional (and thus has
+        ///     an adapter ID). False otherwise.</returns>
         public bool GetCurrentAdapterIdForDevice(string displayAdapterDevicePath, out CCD.LUID adapterId)
         {
             return mCurrentRuntimeDeviceAdapterNamesToAdapterIds.TryGetValue(displayAdapterDevicePath, out adapterId);
         }
 
+        /// <summary>
+        /// Checks the adapter IDs in use by a DisplayPreset and validates whether those IDs need to be
+        /// remapped to new values before being applied, and whether all the display adapters the preset
+        /// uses are still installed and available on the system.
+        /// </summary>
+        /// <param name="displayPreset">The preset to validate.</param>
+        /// <returns>A DisplayPresetAdapterIdValidation value indicating the validation result.</returns>
         public DisplayPresetAdapterIdValidation ValidateDisplayPresetAdapterIds(DisplayPreset displayPreset)
         {
             bool allAdapterNamesAccountedFor = true;
             bool allAdapterIdsValid = true;
 
-            foreach (CCD.DisplayConfigAdapterName adapterName in displayPreset.AdapterNames)
+            if (displayPreset.AdapterNames != null)
             {
-                if (!mCurrentRuntimeDeviceAdapterNamesToAdapterIds.ContainsKey(adapterName.adapterDevicePath))
+                foreach (CCD.DisplayConfigAdapterName adapterName in displayPreset.AdapterNames)
                 {
-                    allAdapterNamesAccountedFor = false;
-                    break;
-                }
+                    if (!mCurrentRuntimeDeviceAdapterNamesToAdapterIds.ContainsKey(adapterName.adapterDevicePath))
+                    {
+                        allAdapterNamesAccountedFor = false;
+                        break;
+                    }
 
-                if (!mCurrentRuntimeDeviceAdapterNamesToAdapterIds[adapterName.adapterDevicePath].Equals(adapterName.header.adapterId))
-                {
-                    allAdapterIdsValid = false;
+                    if (!mCurrentRuntimeDeviceAdapterNamesToAdapterIds[adapterName.adapterDevicePath].Equals(adapterName.header.adapterId))
+                    {
+                        allAdapterIdsValid = false;
+                    }
                 }
             }
 
-            if (!allAdapterNamesAccountedFor)
+            if (displayPreset.AdapterNames == null)
+            {
+                return DisplayPresetAdapterIdValidation.DisplayPresetMissingAdapterInformation;
+            }
+            else if (!allAdapterNamesAccountedFor)
             {
                 return DisplayPresetAdapterIdValidation.MissingAdapter;
             }
@@ -82,6 +119,13 @@ namespace OutputSwitcher.Core
             }
         }
 
+        /// <summary>
+        /// Remaps an array of DisplayConfigPathInfo source and target entries' adapter IDs to use the
+        /// new adapter IDs 
+        /// </summary>
+        /// <param name="displayPreset">The DisplayPreset containing old adapter ID information to remap.</param>
+        /// <param name="pathInfoArray">The array of paths to modify with new adapter IDs.</param>
+        /// <returns></returns>
         public bool RemapDisplayConfigPathInfoAdapterIds(DisplayPreset displayPreset, ref CCD.DisplayConfigPathInfo[] pathInfoArray)
         {
             bool allAdapterIdsRemappable = true;
@@ -121,6 +165,13 @@ namespace OutputSwitcher.Core
             return allAdapterIdsRemappable;
         }
 
+        /// <summary>
+        /// Remaps an array of DisplayConfigModeInfo entries' adapter IDs from a previous session to
+        /// the current Windows session's adapter IDs for a given display adapter.
+        /// </summary>
+        /// <param name="displayPreset">The Display preset containing old adapter ID information to remap</param>
+        /// <param name="modeInfoArray">The array of mode info entries to modify with new adapter IDs.</param>
+        /// <returns></returns>
         public bool RemapDisplayConfigModeInfoAdapterIds(DisplayPreset displayPreset, ref CCD.DisplayConfigModeInfo[] modeInfoArray)
         {
             bool allAdapterIdsRemappable = true;
@@ -196,6 +247,8 @@ namespace OutputSwitcher.Core
                     adapterName.header.size = (uint)Marshal.SizeOf(adapterName);
 
                     // TODO: Uhhh... silently ignore errors?
+                    // There appears to be a bug here where we get adapter Id 0,0 here but that doesn't
+                    // exist in the output?
                     if (CCD.DisplayConfigGetDeviceInfo(ref adapterName) == Win32Constants.ERROR_SUCCESS)
                     {
                         adapterIdToAdapterName.Add(
