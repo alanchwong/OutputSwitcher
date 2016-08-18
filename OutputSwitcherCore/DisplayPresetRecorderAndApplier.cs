@@ -106,14 +106,16 @@ namespace OutputSwitcher.Core
             AdapterIdMapper.DisplayPresetAdapterIdValidation validationResult =
                 AdapterIdMapper.GetAdapterIdMapper().ValidateDisplayPresetAdapterIds(displayPreset);
 
-            CCD.DisplayConfigPathInfo[] pathInfoArrayToApply = displayPreset.PathInfoArray;
-            CCD.DisplayConfigModeInfo[] modeInfoArrayToApply = displayPreset.ModeInfoArray;
+            // Copy to working arrays so that if we need to remap we don't affect the original
+            // display preset data.
+            CCD.DisplayConfigPathInfo[] pathInfoArrayToApply = new CCD.DisplayConfigPathInfo[displayPreset.PathInfoArray.Length];
+            displayPreset.PathInfoArray.CopyTo(pathInfoArrayToApply, 0);
+
+            CCD.DisplayConfigModeInfo[] modeInfoArrayToApply = new CCD.DisplayConfigModeInfo[displayPreset.ModeInfoArray.Length];
+            displayPreset.ModeInfoArray.CopyTo(modeInfoArrayToApply, 0);
 
             if (validationResult == AdapterIdMapper.DisplayPresetAdapterIdValidation.NeedAdapterIdRemap)
             {
-                pathInfoArrayToApply = displayPreset.PathInfoArray;
-                modeInfoArrayToApply = displayPreset.ModeInfoArray;
-
                 // TODO: The remap methods return a boolean, though it sorta doesn't matter for us since
                 // we've already done validation. It's the right design that those methods return a
                 // boolean, so maybe we should put an assert here?

@@ -237,8 +237,13 @@ namespace OutputSwitcher.Core
             Dictionary<CCD.LUID, string> adapterIdToAdapterName = new Dictionary<CCD.LUID, string>();
 
             // Find the mapping for each unique LUID -> device adapter name.
-            foreach (CCD.DisplayConfigPathInfo pathInfo in pathInfoArray)
+            // Don't use a foreach here because there are some cases where QueryDisplayConfig changes
+            // the length of pathInfoArray to have more elements than numPathArrayElements would indicate,
+            // with the extra elements invalidly initialized to 0s in all of its members.
+            for (int i = 0; i < numPathArrayElements; i++)
             {
+                CCD.DisplayConfigPathInfo pathInfo = pathInfoArray[i];
+
                 if (!adapterIdToAdapterName.ContainsKey(pathInfo.sourceInfo.adapterId))
                 {
                     CCD.DisplayConfigAdapterName adapterName = new CCD.DisplayConfigAdapterName();
@@ -246,15 +251,11 @@ namespace OutputSwitcher.Core
                     adapterName.header.adapterId = pathInfo.sourceInfo.adapterId;
                     adapterName.header.size = (uint)Marshal.SizeOf(adapterName);
 
-                    // TODO: Uhhh... silently ignore errors?
-                    // There appears to be a bug here where we get adapter Id 0,0 here but that doesn't
-                    // exist in the output?
-                    if (CCD.DisplayConfigGetDeviceInfo(ref adapterName) == Win32Constants.ERROR_SUCCESS)
-                    {
-                        adapterIdToAdapterName.Add(
-                            adapterName.header.adapterId,
-                            adapterName.adapterDevicePath);
-                    }
+                    Win32Utilities.ThrowIfResultCodeNotSuccess(CCD.DisplayConfigGetDeviceInfo(ref adapterName));
+
+                    adapterIdToAdapterName.Add(
+                        adapterName.header.adapterId,
+                        adapterName.adapterDevicePath);
                 }
             }
 
