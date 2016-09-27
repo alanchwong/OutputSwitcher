@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using OutputSwitcher.Core;
+using OutputSwitcher.WinAPI;
 
 namespace OutputSwitcher.TrayApp
 {
@@ -25,6 +26,30 @@ namespace OutputSwitcher.TrayApp
             mNotifyIcon.DoubleClick += NotifyIcon_DoubleClick;
 
             InitializeContextMenu();
+            InitializeHotkey();
+        }
+
+        private void InitializeHotkey()
+        {
+            bool result = Hotkey.RegisterHotKey(
+                IntPtr.Zero,
+                (int)DateTime.Now.ToFileTimeUtc(),
+                VirtualKeyCodes.MOD_ALT | VirtualKeyCodes.MOD_SHIFT,
+                VirtualKeyCodes.VK_P);
+
+            if (!result)
+                throw new Exception("Unable to register hotkey.");
+
+            mMessageFilter = new HotkeyMessageFilter();
+
+            // Technically this can degrade performance, but we're not doing a ton of work in there.
+            // Just have to make sure it's non-blocking.
+            Application.AddMessageFilter(mMessageFilter);
+
+            mMessageFilter.OnPresetSwitchHotkey += () =>
+            {
+                ShowEnterNewPresetNameForm();
+            };
         }
 
         /// <summary>
@@ -148,6 +173,14 @@ namespace OutputSwitcher.TrayApp
         /// <param name="e"></param>
         private void CaptureNewPreset_ItemClicked(object sender, EventArgs e)
         {
+            ShowEnterNewPresetNameForm();
+        }
+
+        /// <summary>
+        /// Show the new preset name form if it isn't already visible.
+        /// </summary>
+        private void ShowEnterNewPresetNameForm()
+        {
             if (mEnterNewPresetNameForm == null)
             {
                 mEnterNewPresetNameForm = new EnterNewPresetNameForm();
@@ -269,5 +302,7 @@ namespace OutputSwitcher.TrayApp
 
         private ToolStripDropDownButton applyPresetDropDownButton;
         private ToolStripDropDownButton removePresetDropDownButton;
+
+        private HotkeyMessageFilter mMessageFilter;
     }
 }

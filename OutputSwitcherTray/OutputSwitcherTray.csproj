@@ -53,6 +53,7 @@
     <Compile Include="EnterNewPresetNameForm.Designer.cs">
       <DependentUpon>EnterNewPresetNameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="HotkeyMessageFilter.cs" />
     <Compile Include="NoPresetPresetContextMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -101,6 +102,10 @@
     <ProjectReference Include="..\OutputSwitcherCore\OutputSwitcherCore.csproj">
       <Project>{164c2b8b-51af-4b05-bdff-6341e8b00f92}</Project>
       <Name>OutputSwitcherCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OutputSwitcherWinAPI\OutputSwitcherWinAPI.csproj">
+      <Project>{ef8afdd0-0f6d-406d-a184-433e2dda28b7}</Project>
+      <Name>OutputSwitcherWinAPI</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -7,7 +7,7 @@
     <ProjectGuid>{EF8AFDD0-0F6D-406D-A184-433E2DDA28B7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OutputSwitcherWinAPI</RootNamespace>
+    <RootNamespace>OutputSwitcher.WinAPI</RootNamespace>
     <AssemblyName>OutputSwitcherWinAPI</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -41,7 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CCD.cs" />
+    <Compile Include="Hotkey.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VirtualKeyCodes.cs" />
     <Compile Include="Win32Constants.cs" />
     <Compile Include="Win32Utilities.cs" />
     <Compile Include="WindowsTypes.cs" />
