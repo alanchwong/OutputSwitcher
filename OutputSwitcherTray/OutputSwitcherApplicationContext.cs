@@ -57,9 +57,10 @@ namespace OutputSwitcher.TrayApp
         /// </summary>
         private void InitializeContextMenu()
         {
-            ToolStripItem[] afterPresetsToolStripItems = new ToolStripItem[2];
+            ToolStripItem[] afterPresetsToolStripItems = new ToolStripItem[3];
             afterPresetsToolStripItems[0] = new ToolStripButton("Capture current display configuration as preset", null, CaptureNewPreset_ItemClicked);
-            afterPresetsToolStripItems[1] = new ToolStripButton("Exit", null, ContextMenuStrip_Exit);
+            afterPresetsToolStripItems[1] = new ToolStripButton("Edit global hotkeys", null, EditGlobalHotkeys_ItemClicked);
+            afterPresetsToolStripItems[2] = new ToolStripButton("Exit", null, ContextMenuStrip_Exit);
 
             List<DisplayPreset> displayPresets = DisplayPresetCollection.GetDisplayPresetCollection().GetPresets();
 
@@ -176,6 +177,11 @@ namespace OutputSwitcher.TrayApp
             ShowEnterNewPresetNameForm();
         }
 
+        private void EditGlobalHotkeys_ItemClicked(object sender, EventArgs e)
+        {
+            ShowEditGlobalHotkeysForm();
+        }
+
         /// <summary>
         /// Show the new preset name form if it isn't already visible.
         /// </summary>
@@ -194,6 +200,12 @@ namespace OutputSwitcher.TrayApp
             {
                 mEnterNewPresetNameForm.Activate();
             }
+        }
+
+        private void ShowEditGlobalHotkeysForm()
+        {
+            PresetHotkeyForm presetHotkeyForm = new PresetHotkeyForm(DisplayPresetCollection.GetDisplayPresetCollection(), PresetToHotkeyMap.GetInstance());
+            presetHotkeyForm.ShowDialog();
         }
 
         /// <summary>
@@ -299,6 +311,7 @@ namespace OutputSwitcher.TrayApp
         private NotifyIcon mNotifyIcon;
 
         private EnterNewPresetNameForm mEnterNewPresetNameForm;
+        private PresetHotkeyForm mPresetHotkeyForm;
 
         private ToolStripDropDownButton applyPresetDropDownButton;
         private ToolStripDropDownButton removePresetDropDownButton;
