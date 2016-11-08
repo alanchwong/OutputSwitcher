@@ -9,13 +9,13 @@ namespace OutputSwitcher.TrayApp
     [Serializable]
     public struct PresetHotkeyPersistencePair
     {
-        public PresetHotkeyPersistencePair(string presetName, uint keyCode)
+        public PresetHotkeyPersistencePair(string presetName, VirtualHotkey virtualHotkey)
         {
             PresetName = presetName;
-            KeyCode = keyCode;
+            HotkeyKeycode = virtualHotkey;
         }
 
         public string PresetName;
-        public uint KeyCode;
+        public VirtualHotkey HotkeyKeycode;
     }
 }

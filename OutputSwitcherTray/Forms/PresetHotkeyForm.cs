@@ -15,6 +15,13 @@ namespace OutputSwitcher.TrayApp
 {
     partial class PresetHotkeyForm : Form
     {
+        /* NOTES
+         *  There are a lot of crunchy synchronization issues this whole design introduces.
+         *  By allowing for the hotkey mappings to live separately from the display presets
+         *  collection, we add complexity in having to sync between those two collections.
+         *  What do we do if there are presets added while this is active?
+         */
+
         /// <summary>
         /// Structure to hold the last user-entered new hotkey combination.
         /// </summary>
@@ -32,7 +39,7 @@ namespace OutputSwitcher.TrayApp
             mNewHotkey = new NewHotkey();
 
             mPresetToHotkeyMap = presetToHotkeyMap;
-            mPresetToHotkeyDictionaryForComboBox = new Dictionary<string, uint>(mPresetToHotkeyMap.GetHotkeyMappings());
+            mPresetToHotkeyDictionaryForComboBox = new Dictionary<string, VirtualHotkey>(mPresetToHotkeyMap.GetHotkeyMappings());
             mPresetToHotkeyMap.OnPresetToHotkeyMappingChanged += OnPresetToHotkeyMapChanged;
 
             presetsComboBox.Items.AddRange(displayPresetCollection.GetPresets().ToArray());
@@ -55,12 +62,27 @@ namespace OutputSwitcher.TrayApp
 
         private void ShowSelectedPresetKeyCombination(string preset)
         {
-            uint keycode;
+            VirtualHotkey keycode;
 
             if (mPresetToHotkeyDictionaryForComboBox.TryGetValue(preset, out keycode))
             {
                 // TODO: Do some magic to make it look okay
-                selectedPresetHotkeyTextbox.Text = keycode.ToString();
+                StringBuilder pleasantHotkeyStringBuilder = new StringBuilder();
+
+                if (VirtualKeyCodes.KeyCodeHasCtrl(keycode.ModifierKeyCode))
+                    pleasantHotkeyStringBuilder.Append("CTRL + ");
+
+                if (VirtualKeyCodes.KeyCodeHasAlt(keycode.ModifierKeyCode))
+                    pleasantHotkeyStringBuilder.Append("ALT + ");
+
+                if (VirtualKeyCodes.KeyCodeHasShift(keycode.ModifierKeyCode))
+                    pleasantHotkeyStringBuilder.Append("SHIFT + ");
+
+                char alphanumericKey;
+                if (VirtualKeyCodes.TryGetAlphanumericKeyFromKeyCode(keycode.KeyCode, out alphanumericKey))
+                    pleasantHotkeyStringBuilder.Append(Char.ToUpper(alphanumericKey));
+
+                selectedPresetHotkeyTextbox.Text = pleasantHotkeyStringBuilder.ToString();
                 newHotkeyTextBox.Text = "";
             }
             else
@@ -70,16 +92,11 @@ namespace OutputSwitcher.TrayApp
             }
         }
 
-        private void OnPresetToHotkeyMapChanged(string presetName, uint keyCode, PresetToHotkeyMap.PresetToHotkeyMappingChangeType changeType)
+        private void OnPresetToHotkeyMapChanged(string presetName, VirtualHotkey keyCode, PresetToHotkeyMap.PresetToHotkeyMappingChangeType changeType)
         {
-            if (changeType == PresetToHotkeyMap.PresetToHotkeyMappingChangeType.HotkeySet)
-            {
-                mPresetToHotkeyDictionaryForComboBox[presetName] = keyCode;
-            }
-            else
-            {
-                mPresetToHotkeyDictionaryForComboBox[presetName] = 0;
-            }
+            // Dumbly update the entire working dictionary of preset to hotkey mappings.
+            mPresetToHotkeyDictionaryForComboBox = mPresetToHotkeyMap.GetHotkeyMappings();
+            ShowSelectedPresetKeyCombination(((DisplayPreset)presetsComboBox.SelectedItem).Name);
         }
 
         private void PresetsComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -137,25 +154,26 @@ namespace OutputSwitcher.TrayApp
         {
             if (mNewHotkey.NewHotkeyIsValid)
             {
-                uint virtualKeyCode = 0;
+                uint modifierKeyCode = 0;
 
                 if ((mNewHotkey.NewHotkeyModifiers & Keys.Alt) > 0)
-                    virtualKeyCode = virtualKeyCode | VirtualKeyCodes.MOD_ALT;
+                    modifierKeyCode = modifierKeyCode | VirtualKeyCodes.MOD_ALT;
 
                 if ((mNewHotkey.NewHotkeyModifiers & Keys.Control) > 0)
-                    virtualKeyCode = virtualKeyCode | VirtualKeyCodes.MOD_CONTROL;
+                    modifierKeyCode = modifierKeyCode | VirtualKeyCodes.MOD_CONTROL;
 
                 if ((mNewHotkey.NewHotkeyModifiers & Keys.Shift) > 0)
-                    virtualKeyCode = virtualKeyCode | VirtualKeyCodes.MOD_SHIFT;
+                    modifierKeyCode = modifierKeyCode | VirtualKeyCodes.MOD_SHIFT;
 
-                virtualKeyCode = virtualKeyCode | (uint)mNewHotkey.NewHotkeyKeyCode;
+                uint keypressKeyCode = (uint)mNewHotkey.NewHotkeyKeyCode;
 
+                VirtualHotkey virtualKeyCode = new VirtualHotkey(modifierKeyCode, keypressKeyCode);
                 mPresetToHotkeyMap.SetHotkey(((DisplayPreset)presetsComboBox.SelectedItem).Name, virtualKeyCode);
             }
         }
 
         private PresetToHotkeyMap mPresetToHotkeyMap;
-        private Dictionary<string, uint> mPresetToHotkeyDictionaryForComboBox;
+        private Dictionary<string, VirtualHotkey> mPresetToHotkeyDictionaryForComboBox;
         private NewHotkey mNewHotkey;
     }
 }

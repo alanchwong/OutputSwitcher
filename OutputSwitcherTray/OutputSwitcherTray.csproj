@@ -53,6 +53,12 @@
     <Compile Include="Forms\EnterNewPresetNameForm.Designer.cs">
       <DependentUpon>EnterNewPresetNameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\UseAppliedPresetCountdownForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\UseAppliedPresetCountdownForm.Designer.cs">
+      <DependentUpon>UseAppliedPresetCountdownForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="HotkeyMessageFilter.cs" />
     <Compile Include="NoPresetPresetContextMenuItem.cs">
       <SubType>Component</SubType>
@@ -72,17 +78,15 @@
     <Compile Include="PresetToHotkeyMapPersistence.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UseAppliedPresetCountdownForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UseAppliedPresetCountdownForm.Designer.cs">
-      <DependentUpon>UseAppliedPresetCountdownForm.cs</DependentUpon>
-    </Compile>
+    <Compile Include="VirtualHotkey.cs" />
     <EmbeddedResource Include="Forms\EnterNewPresetNameForm.resx">
       <DependentUpon>EnterNewPresetNameForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PresetHotkeyForm.resx">
       <DependentUpon>PresetHotkeyForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UseAppliedPresetCountdownForm.resx">
+      <DependentUpon>UseAppliedPresetCountdownForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -94,9 +98,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="UseAppliedPresetCountdownForm.resx">
-      <DependentUpon>UseAppliedPresetCountdownForm.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

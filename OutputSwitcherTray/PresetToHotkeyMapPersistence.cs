@@ -16,9 +16,9 @@ namespace OutputSwitcher.TrayApp
 
         private static readonly string PresetToHotkeysMapFilename = DisplayConfigurationsFilePath + "\\PresetHotkeysMap.xml";
 
-        public static Dictionary<string, uint> LoadPresetToHotkeysMap()
+        public static Dictionary<string, VirtualHotkey> LoadPresetToHotkeysMap()
         {
-            Dictionary<string, uint> presetsToHotkeysMap = null;
+            Dictionary<string, VirtualHotkey> presetsToHotkeysMap = null;
             List<PresetHotkeyPersistencePair> presetHotkeyPersistenceList = new List<PresetHotkeyPersistencePair>();
 
             // As the .NET KeyValuePair type is non-serializable, we need to use an intermediate collection
@@ -29,11 +29,11 @@ namespace OutputSwitcher.TrayApp
             {
                 StreamReader presetToHotkeysMapFile = new StreamReader(File.OpenRead(PresetToHotkeysMapFilename));
                 presetHotkeyPersistenceList = (List<PresetHotkeyPersistencePair>)reader.Deserialize(presetToHotkeysMapFile);
-                presetsToHotkeysMap = new Dictionary<string, uint>();
+                presetsToHotkeysMap = new Dictionary<string, VirtualHotkey>();
 
                 foreach (PresetHotkeyPersistencePair presetToHotkeyPair in presetHotkeyPersistenceList)
                 {
-                    presetsToHotkeysMap.Add(presetToHotkeyPair.PresetName, presetToHotkeyPair.KeyCode);
+                    presetsToHotkeysMap.Add(presetToHotkeyPair.PresetName, presetToHotkeyPair.HotkeyKeycode);
                 }
 
                 presetToHotkeysMapFile.Close();
@@ -42,7 +42,7 @@ namespace OutputSwitcher.TrayApp
             return presetsToHotkeysMap;
         }
 
-        public static void SavePresetToHotkeysMap(Dictionary<string, uint> presetToHotkeysMap)
+        public static void SavePresetToHotkeysMap(Dictionary<string, VirtualHotkey> presetToHotkeysMap)
         {
             XmlSerializer writer = new XmlSerializer(typeof(List<PresetHotkeyPersistencePair>));
 
@@ -55,7 +55,7 @@ namespace OutputSwitcher.TrayApp
             // As the .NET KeyValuePair type is non-serializable, we need to generate the intermediate
             // collection of preset to hotkey pairings with our custom struct.
             List<PresetHotkeyPersistencePair> presetHotkeyPersistenceList = new List<PresetHotkeyPersistencePair>();            
-            foreach (KeyValuePair<string, uint> kvPair in presetToHotkeysMap)
+            foreach (KeyValuePair<string, VirtualHotkey> kvPair in presetToHotkeysMap)
             {
                 presetHotkeyPersistenceList.Add(new PresetHotkeyPersistencePair(kvPair.Key, kvPair.Value));
             }

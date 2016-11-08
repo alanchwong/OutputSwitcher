@@ -26,9 +26,9 @@ namespace OutputSwitcher.TrayApp
         /// Event handler for a change in the preset to hotkey mappings.
         /// </summary>
         /// <param name="presetName">Name of the preset with a hotkey mapping.</param>
-        /// <param name="keyCode">The virtual key code of the hotkey.</param>
+        /// <param name="virtualHotkey">The virtual key code of the hotkey with modifiers.</param>
         /// <param name="changeType">The type of change to the mapping.</param>
-        public delegate void PresetToHotkeyMappingChangedHandler(string presetName, uint keyCode, PresetToHotkeyMappingChangeType changeType);
+        public delegate void PresetToHotkeyMappingChangedHandler(string presetName, VirtualHotkey virtualHotkey, PresetToHotkeyMappingChangeType changeType);
 
         /// <summary>
         /// Event raised when there is a change in the preset to hotkey mappings.
@@ -39,14 +39,14 @@ namespace OutputSwitcher.TrayApp
         /// Set the global hotkey of a display preset.
         /// </summary>
         /// <param name="presetName">The display preset name.</param>
-        /// <param name="keyCode">The virtual key code of the global hotkey.</param>
-        public void SetHotkey(string presetName, uint keyCode)
+        /// <param name="virtualHotkey">The virtual key code of the global hotkey with modifiers.</param>
+        public void SetHotkey(string presetName, VirtualHotkey virtualHotkey)
         {
             // Use the Item property to set the value because if it already exists
             // we want to overwrite it.
-            mPresetToHotkeyDictionary[presetName] = keyCode;
+            mPresetToHotkeyDictionary[presetName] = virtualHotkey;
             SaveMapping();
-            OnPresetToHotkeyMappingChanged?.Invoke(presetName, keyCode, PresetToHotkeyMappingChangeType.HotkeySet);
+            OnPresetToHotkeyMappingChanged?.Invoke(presetName, virtualHotkey, PresetToHotkeyMappingChangeType.HotkeySet);
         }
 
         /// <summary>
@@ -57,13 +57,13 @@ namespace OutputSwitcher.TrayApp
         {
             mPresetToHotkeyDictionary.Remove(presetName);
             SaveMapping();
-            OnPresetToHotkeyMappingChanged?.Invoke(presetName, 0, PresetToHotkeyMappingChangeType.HotkeyRemoved);
+            OnPresetToHotkeyMappingChanged?.Invoke(presetName, new VirtualHotkey(0, 0), PresetToHotkeyMappingChangeType.HotkeyRemoved);
         }
 
-        public Dictionary<string, uint> GetHotkeyMappings()
+        public Dictionary<string, VirtualHotkey> GetHotkeyMappings()
         {
             // Return a copy.
-            return new Dictionary<string, uint>(mPresetToHotkeyDictionary);
+            return new Dictionary<string, VirtualHotkey>(mPresetToHotkeyDictionary);
         }
 
         private void SaveMapping()
@@ -73,13 +73,13 @@ namespace OutputSwitcher.TrayApp
 
         private PresetToHotkeyMap()
         {
-            Dictionary<string, uint> dictionary = PresetToHotkeyMapPersistence.LoadPresetToHotkeysMap();
+            Dictionary<string, VirtualHotkey> dictionary = PresetToHotkeyMapPersistence.LoadPresetToHotkeysMap();
 
-            mPresetToHotkeyDictionary = dictionary != null ? new Dictionary<string, uint>(dictionary) : new Dictionary<string, uint>();
+            mPresetToHotkeyDictionary = dictionary != null ? new Dictionary<string, VirtualHotkey>(dictionary) : new Dictionary<string, VirtualHotkey>();
         }
 
         private static PresetToHotkeyMap mInstance;
 
-        private Dictionary<string, uint> mPresetToHotkeyDictionary;
+        private Dictionary<string, VirtualHotkey> mPresetToHotkeyDictionary;
     }
 }

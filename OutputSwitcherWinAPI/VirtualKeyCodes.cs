@@ -214,5 +214,35 @@ namespace OutputSwitcher.WinAPI
         public const uint VK_X = 0x58;
         public const uint VK_Y = 0x59;
         public const uint VK_Z = 0x5A;
+
+        public static bool KeyCodeHasCtrl(uint keycode)
+        {
+            return (keycode & MOD_CONTROL) > 0;
+        }
+
+        public static bool KeyCodeHasAlt(uint keycode)
+        {
+            return (keycode & MOD_ALT) > 0;
+        }
+
+        public static bool KeyCodeHasShift(uint keycode)
+        {
+            return (keycode & MOD_SHIFT) > 0;
+        } 
+
+        public static bool TryGetAlphanumericKeyFromKeyCode(uint keycode, out char alphaNumbericChar)
+        {
+            if ((keycode >= VK_A && keycode <= VK_Z) ||
+                (keycode >= VK_0 && keycode <= VK_9))
+            {
+                alphaNumbericChar = (char)keycode;
+                return true;
+            }
+            else
+            {
+                alphaNumbericChar = ' ';
+                return false;
+            }
+        }
     }
 }
