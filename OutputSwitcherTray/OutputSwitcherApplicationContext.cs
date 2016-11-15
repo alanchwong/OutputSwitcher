@@ -29,27 +29,19 @@ namespace OutputSwitcher.TrayApp
             InitializeHotkey();
         }
 
+        /// <summary>
+        /// Initializes global hotkey infrastructure.
+        /// </summary>
         private void InitializeHotkey()
         {
-            bool result = Hotkey.RegisterHotKey(
-                IntPtr.Zero,
-                (int)DateTime.Now.ToFileTimeUtc(),
-                VirtualKeyCodes.MOD_ALT | VirtualKeyCodes.MOD_SHIFT,
-                VirtualKeyCodes.VK_P);
-
-            if (!result)
-                throw new Exception("Unable to register hotkey.");
-
             mMessageFilter = new HotkeyMessageFilter();
+
+            HotkeyRegistrar.Initialize(PresetToHotkeyMap.GetInstance());
+            HotkeyHandler.Initialize(PresetToHotkeyMap.GetInstance(), mMessageFilter);
 
             // Technically this can degrade performance, but we're not doing a ton of work in there.
             // Just have to make sure it's non-blocking.
             Application.AddMessageFilter(mMessageFilter);
-
-            mMessageFilter.OnPresetSwitchHotkey += () =>
-            {
-                ShowEnterNewPresetNameForm();
-            };
         }
 
         /// <summary>
@@ -139,15 +131,8 @@ namespace OutputSwitcher.TrayApp
 
             if (presetContextMenuItem != null)
             {
-                DisplayPreset lastConfig = 
-                    DisplayPresetRecorderAndApplier.ReturnLastConfigAndApplyPreset(
-                        DisplayPresetCollection.GetDisplayPresetCollection().GetPreset(presetContextMenuItem.PresetName));
-
-                // Pop up a dialog to give user the option to keep the configuration or else
-                // automatically revert to the last configuration.
-                // TODO: This seems weird to pass control away like this.
-                UseAppliedPresetCountdownForm revertPresetCountdownForm = new UseAppliedPresetCountdownForm(lastConfig);
-                revertPresetCountdownForm.Show();
+                SafePresetApplier.ApplyPresetWithRevertCountdown(
+                    DisplayPresetCollection.GetDisplayPresetCollection().GetPreset(presetContextMenuItem.PresetName));
             }
         }
 
@@ -177,9 +162,28 @@ namespace OutputSwitcher.TrayApp
             ShowEnterNewPresetNameForm();
         }
 
+        /// <summary>
+        /// Event handler for when "Edit global hotkeys" context menu item is clicked. Launches
+        /// a form to allow the user to edit global hotkeys for the display presets.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EditGlobalHotkeys_ItemClicked(object sender, EventArgs e)
         {
-            ShowEditGlobalHotkeysForm();
+            if (mPresetHotkeyForm == null)
+            {
+                mPresetHotkeyForm = new PresetHotkeyForm(DisplayPresetCollection.GetDisplayPresetCollection(), PresetToHotkeyMap.GetInstance());
+                mPresetHotkeyForm.FormClosed += MPresetHotkeyForm_FormClosed;
+            }
+            else if (!mPresetHotkeyForm.Visible)
+                mPresetHotkeyForm.ShowDialog();
+            else
+                mPresetHotkeyForm.Activate();
+        }
+
+        private void MPresetHotkeyForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mPresetHotkeyForm = null;
         }
 
         /// <summary>
@@ -200,12 +204,6 @@ namespace OutputSwitcher.TrayApp
             {
                 mEnterNewPresetNameForm.Activate();
             }
-        }
-
-        private void ShowEditGlobalHotkeysForm()
-        {
-            PresetHotkeyForm presetHotkeyForm = new PresetHotkeyForm(DisplayPresetCollection.GetDisplayPresetCollection(), PresetToHotkeyMap.GetInstance());
-            presetHotkeyForm.ShowDialog();
         }
 
         /// <summary>

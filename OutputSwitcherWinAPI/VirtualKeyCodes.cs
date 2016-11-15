@@ -13,6 +13,7 @@ namespace OutputSwitcher.WinAPI
         public const uint MOD_CONTROL = 0x0002;   // Either CTRL key held down.
         public const uint MOD_SHIFT = 0x0004;     // Either SHIFT key held down.
         public const uint MOD_WIN = 0x0008;       // Either WIN key held down.
+        public const uint MOD_NOREPEAT = 0x4000;  // Flag to RegisterHotkey to not generate multiple hotkey events when hotkey is held down.
 
         public const uint VK_LBUTTON = 0x01;
         public const uint VK_RBUTTON = 0x02;
@@ -57,7 +58,8 @@ namespace OutputSwitcher.WinAPI
         public const uint VK_INSERT = 0x2D;
         public const uint VK_DELETE = 0x2E;
         public const uint VK_HELP = 0x2F;
-        public const uint VK_LWIN = 0x5B; // ASCII '0' - '9' (0x30 - 0x39)
+        public const uint VK_LWIN = 0x5B; 
+        // ASCII '0' - '9' (0x30 - 0x39)
         // * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
 
         public const uint VK_RWIN = 0x5C;
@@ -230,19 +232,160 @@ namespace OutputSwitcher.WinAPI
             return (keycode & MOD_SHIFT) > 0;
         } 
 
-        public static bool TryGetAlphanumericKeyFromKeyCode(uint keycode, out char alphaNumbericChar)
+        public static bool TryGetAlphanumericKeyFromKeyCode(uint keycode, out string friendlyAlphanumericKey)
         {
             if ((keycode >= VK_A && keycode <= VK_Z) ||
                 (keycode >= VK_0 && keycode <= VK_9))
             {
-                alphaNumbericChar = (char)keycode;
+                friendlyAlphanumericKey = ((char)keycode).ToString();
                 return true;
             }
             else
             {
-                alphaNumbericChar = ' ';
+                friendlyAlphanumericKey = "";
                 return false;
             }
+        }
+
+        public static bool TryGetNumpadKeyFromKeyCode(uint keycode, out string numpadFriendlyName)
+        {
+            if (keycode >= VK_NUMPAD0 && keycode <= VK_NUMPAD9)
+            {
+                numpadFriendlyName = "NUMPAD" + (keycode - VK_NUMPAD0);
+                return true;
+            }
+            else if (keycode >= VK_MULTIPLY && keycode <= VK_DIVIDE)
+            {
+                switch (keycode)
+                {
+                    case VK_MULTIPLY:
+                        numpadFriendlyName = "NUMPAD*";
+                        break;
+                    case VK_ADD:
+                        numpadFriendlyName = "NUMPAD+";
+                        break;
+                    case VK_SEPARATOR:
+                        numpadFriendlyName = "NUMPAD-SEPARATOR";
+                        break;
+                    case VK_SUBTRACT:
+                        numpadFriendlyName = "NUMPAD-";
+                        break;
+                    case VK_DECIMAL:
+                        numpadFriendlyName = "NUMPAD.";
+                        break;
+                    case VK_DIVIDE:
+                        numpadFriendlyName = "NUMPAD /";
+                        break;
+                    default:
+                        numpadFriendlyName = "";
+                        break;
+                }
+                return true;
+            }
+            else
+            {
+                numpadFriendlyName = "";
+                return false;
+            }
+        }
+
+        public static bool TryGetFunctionKeyFromKeyCode(uint keycode, out string friendlyFunctionKey)
+        {
+            if (keycode >= VK_F1 && keycode <= VK_F24)
+            {
+                friendlyFunctionKey = "F" + (keycode - VK_F1 + 1);
+                return true;
+            }
+            else
+            {
+                friendlyFunctionKey = "";
+                return false;
+            }
+        }
+
+        public static string GetFriendlyKeyCodeName(uint keycode)
+        {
+            string friendlyKeyCodeName;
+
+            if (TryGetAlphanumericKeyFromKeyCode(keycode, out friendlyKeyCodeName))
+                return friendlyKeyCodeName;
+            else if (TryGetNumpadKeyFromKeyCode(keycode, out friendlyKeyCodeName))
+                return friendlyKeyCodeName;
+            else if (TryGetFunctionKeyFromKeyCode(keycode, out friendlyKeyCodeName))
+                return friendlyKeyCodeName;
+
+            switch (keycode)
+            {
+                case VK_PAUSE:
+                    friendlyKeyCodeName = "Pause";
+                    break;
+                case VK_ESCAPE:
+                    friendlyKeyCodeName = "ESC";
+                    break;
+                case VK_HOME:
+                    friendlyKeyCodeName = "Home";
+                    break;
+                case VK_END:
+                    friendlyKeyCodeName = "End";
+                    break;
+                case VK_LEFT:
+                    friendlyKeyCodeName = "Left";
+                    break;
+                case VK_UP:
+                    friendlyKeyCodeName = "Up";
+                    break;
+                case VK_RIGHT:
+                    friendlyKeyCodeName = "Right";
+                    break;
+                case VK_DOWN:
+                    friendlyKeyCodeName = "Down";
+                    break;
+                case VK_INSERT:
+                    friendlyKeyCodeName = "INS";
+                    break;
+                case VK_DELETE:
+                    friendlyKeyCodeName = "DEL";
+                    break;
+                case VK_NUMLOCK:
+                    friendlyKeyCodeName = "NUMLOCK";
+                    break;
+                case VK_SCROLL:
+                    friendlyKeyCodeName = "SCR LK";
+                    break;
+                case VK_OEM_NEC_EQUAL:
+                    friendlyKeyCodeName = "=";
+                    break;
+                case VK_OEM_1:
+                    friendlyKeyCodeName = ";";
+                    break;
+                case VK_OEM_PLUS:
+                case VK_OEM_COMMA:
+                case VK_OEM_MINUS:
+                case VK_OEM_PERIOD:
+                    // 0x90 is the delta between the virtual keycode and the ascii code for these characters
+                    friendlyKeyCodeName = ((char)(keycode - 0x90)).ToString();
+                    break;
+                case VK_OEM_2:
+                    friendlyKeyCodeName = "/";
+                    break;
+                case VK_OEM_3:
+                    friendlyKeyCodeName = "`";
+                    break;
+                case VK_OEM_4:
+                case VK_OEM_5:
+                case VK_OEM_6:
+                    // 0x80 is the delta between the virtual keycode and the ascii code for these characters
+                    friendlyKeyCodeName = ((char)(keycode - 0x80)).ToString();
+                    break;
+                case VK_OEM_7:
+                    friendlyKeyCodeName = "'";
+                    break;
+                default:
+                    friendlyKeyCodeName = keycode.ToString();
+                    break;
+            }
+
+            return friendlyKeyCodeName;
         }
     }
 }

@@ -60,12 +60,19 @@ namespace OutputSwitcher.TrayApp
             OnPresetToHotkeyMappingChanged?.Invoke(presetName, new VirtualHotkey(0, 0), PresetToHotkeyMappingChangeType.HotkeyRemoved);
         }
 
+        /// <summary>
+        /// Returns a dictionary mapping DisplayPreset names to the hotkeys used to trigger them.
+        /// </summary>
+        /// <returns>Dictionary mapping DisplayPreset names to VirtualHotkey.</returns>
         public Dictionary<string, VirtualHotkey> GetHotkeyMappings()
         {
             // Return a copy.
             return new Dictionary<string, VirtualHotkey>(mPresetToHotkeyDictionary);
         }
 
+        /// <summary>
+        /// Persists the current mapping to disk.
+        /// </summary>
         private void SaveMapping()
         {
             PresetToHotkeyMapPersistence.SavePresetToHotkeysMap(mPresetToHotkeyDictionary);

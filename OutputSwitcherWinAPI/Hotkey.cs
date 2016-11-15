@@ -12,5 +12,9 @@ namespace OutputSwitcher.WinAPI
         [DllImport("user32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool RegisterHotKey(IntPtr hwnd, int id, uint fsModifiers, uint vk);
+
+        [DllImport("user32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool UnregisterHotKey(IntPtr hwnd, int id);
     }
 }

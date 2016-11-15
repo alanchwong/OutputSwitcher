@@ -78,9 +78,7 @@ namespace OutputSwitcher.TrayApp
                 if (VirtualKeyCodes.KeyCodeHasShift(keycode.ModifierKeyCode))
                     pleasantHotkeyStringBuilder.Append("SHIFT + ");
 
-                char alphanumericKey;
-                if (VirtualKeyCodes.TryGetAlphanumericKeyFromKeyCode(keycode.KeyCode, out alphanumericKey))
-                    pleasantHotkeyStringBuilder.Append(Char.ToUpper(alphanumericKey));
+                pleasantHotkeyStringBuilder.Append(VirtualKeyCodes.GetFriendlyKeyCodeName(keycode.KeyCode));
 
                 selectedPresetHotkeyTextbox.Text = pleasantHotkeyStringBuilder.ToString();
                 newHotkeyTextBox.Text = "";
@@ -152,7 +150,7 @@ namespace OutputSwitcher.TrayApp
 
         private void setHotkeyButton_Click(object sender, EventArgs e)
         {
-            if (mNewHotkey.NewHotkeyIsValid)
+            if (presetsComboBox.SelectedItem != null && mNewHotkey.NewHotkeyIsValid)
             {
                 uint modifierKeyCode = 0;
 
@@ -170,6 +168,12 @@ namespace OutputSwitcher.TrayApp
                 VirtualHotkey virtualKeyCode = new VirtualHotkey(modifierKeyCode, keypressKeyCode);
                 mPresetToHotkeyMap.SetHotkey(((DisplayPreset)presetsComboBox.SelectedItem).Name, virtualKeyCode);
             }
+        }
+
+        private void clearHotkeyButton_Click(object sender, EventArgs e)
+        {
+            if (presetsComboBox.SelectedItem != null)
+                mPresetToHotkeyMap.RemoveHotkey(((DisplayPreset)presetsComboBox.SelectedItem).Name);
         }
 
         private PresetToHotkeyMap mPresetToHotkeyMap;
