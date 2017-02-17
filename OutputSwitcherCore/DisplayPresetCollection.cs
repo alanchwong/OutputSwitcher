@@ -56,7 +56,7 @@ namespace OutputSwitcher.Core
             if (!mDisplayPresetDictionary.ContainsKey(preset.Name))
             {
                 mDisplayPresetDictionary.Add(preset.Name, preset);
-                DisplayPresetCollectionChanged(DisplayPresetCollectionChangeType.PresetAdded, preset.Name);
+                DisplayPresetCollectionChanged?.Invoke(DisplayPresetCollectionChangeType.PresetAdded, preset.Name);
 
                 return true;
             }
@@ -76,7 +76,7 @@ namespace OutputSwitcher.Core
             if (mDisplayPresetDictionary.ContainsKey(presetName))
             {
                 mDisplayPresetDictionary.Remove(presetName);
-                DisplayPresetCollectionChanged(DisplayPresetCollectionChangeType.PresetRemoved, presetName);
+                DisplayPresetCollectionChanged?.Invoke(DisplayPresetCollectionChangeType.PresetRemoved, presetName);
 
                 return true;
             }

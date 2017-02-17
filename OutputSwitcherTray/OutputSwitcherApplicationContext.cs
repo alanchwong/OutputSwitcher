@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using OutputSwitcher.Core;
+using OutputSwitcher.WinAPI;
 
 namespace OutputSwitcher.TrayApp
 {
@@ -25,6 +26,22 @@ namespace OutputSwitcher.TrayApp
             mNotifyIcon.DoubleClick += NotifyIcon_DoubleClick;
 
             InitializeContextMenu();
+            InitializeHotkey();
+        }
+
+        /// <summary>
+        /// Initializes global hotkey infrastructure.
+        /// </summary>
+        private void InitializeHotkey()
+        {
+            mMessageFilter = new HotkeyMessageFilter();
+
+            HotkeyRegistrar.Initialize(PresetToHotkeyMap.GetInstance());
+            HotkeyHandler.Initialize(PresetToHotkeyMap.GetInstance(), mMessageFilter);
+
+            // Technically this can degrade performance, but we're not doing a ton of work in there.
+            // Just have to make sure it's non-blocking.
+            Application.AddMessageFilter(mMessageFilter);
         }
 
         /// <summary>
@@ -32,9 +49,10 @@ namespace OutputSwitcher.TrayApp
         /// </summary>
         private void InitializeContextMenu()
         {
-            ToolStripItem[] afterPresetsToolStripItems = new ToolStripItem[2];
+            ToolStripItem[] afterPresetsToolStripItems = new ToolStripItem[3];
             afterPresetsToolStripItems[0] = new ToolStripButton("Capture current display configuration as preset", null, CaptureNewPreset_ItemClicked);
-            afterPresetsToolStripItems[1] = new ToolStripButton("Exit", null, ContextMenuStrip_Exit);
+            afterPresetsToolStripItems[1] = new ToolStripButton("Edit global hotkeys", null, EditGlobalHotkeys_ItemClicked);
+            afterPresetsToolStripItems[2] = new ToolStripButton("Exit", null, ContextMenuStrip_Exit);
 
             List<DisplayPreset> displayPresets = DisplayPresetCollection.GetDisplayPresetCollection().GetPresets();
 
@@ -113,15 +131,8 @@ namespace OutputSwitcher.TrayApp
 
             if (presetContextMenuItem != null)
             {
-                DisplayPreset lastConfig = 
-                    DisplayPresetRecorderAndApplier.ReturnLastConfigAndApplyPreset(
-                        DisplayPresetCollection.GetDisplayPresetCollection().GetPreset(presetContextMenuItem.PresetName));
-
-                // Pop up a dialog to give user the option to keep the configuration or else
-                // automatically revert to the last configuration.
-                // TODO: This seems weird to pass control away like this.
-                UseAppliedPresetCountdownForm revertPresetCountdownForm = new UseAppliedPresetCountdownForm(lastConfig);
-                revertPresetCountdownForm.Show();
+                SafePresetApplier.ApplyPresetWithRevertCountdown(
+                    DisplayPresetCollection.GetDisplayPresetCollection().GetPreset(presetContextMenuItem.PresetName));
             }
         }
 
@@ -147,6 +158,38 @@ namespace OutputSwitcher.TrayApp
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void CaptureNewPreset_ItemClicked(object sender, EventArgs e)
+        {
+            ShowEnterNewPresetNameForm();
+        }
+
+        /// <summary>
+        /// Event handler for when "Edit global hotkeys" context menu item is clicked. Launches
+        /// a form to allow the user to edit global hotkeys for the display presets.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void EditGlobalHotkeys_ItemClicked(object sender, EventArgs e)
+        {
+            if (mPresetHotkeyForm == null)
+            {
+                mPresetHotkeyForm = new PresetHotkeyForm(DisplayPresetCollection.GetDisplayPresetCollection(), PresetToHotkeyMap.GetInstance());
+                mPresetHotkeyForm.FormClosed += MPresetHotkeyForm_FormClosed;
+            }
+            else if (!mPresetHotkeyForm.Visible)
+                mPresetHotkeyForm.ShowDialog();
+            else
+                mPresetHotkeyForm.Activate();
+        }
+
+        private void MPresetHotkeyForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mPresetHotkeyForm = null;
+        }
+
+        /// <summary>
+        /// Show the new preset name form if it isn't already visible.
+        /// </summary>
+        private void ShowEnterNewPresetNameForm()
         {
             if (mEnterNewPresetNameForm == null)
             {
@@ -266,8 +309,11 @@ namespace OutputSwitcher.TrayApp
         private NotifyIcon mNotifyIcon;
 
         private EnterNewPresetNameForm mEnterNewPresetNameForm;
+        private PresetHotkeyForm mPresetHotkeyForm;
 
         private ToolStripDropDownButton applyPresetDropDownButton;
         private ToolStripDropDownButton removePresetDropDownButton;
+
+        private HotkeyMessageFilter mMessageFilter;
     }
 }

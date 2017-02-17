@@ -47,12 +47,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EnterNewPresetNameForm.cs">
+    <Compile Include="Forms\EnterNewPresetNameForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EnterNewPresetNameForm.Designer.cs">
+    <Compile Include="Forms\EnterNewPresetNameForm.Designer.cs">
       <DependentUpon>EnterNewPresetNameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\UseAppliedPresetCountdownForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\UseAppliedPresetCountdownForm.Designer.cs">
+      <DependentUpon>UseAppliedPresetCountdownForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HotkeyHandler.cs" />
+    <Compile Include="HotkeyMessageFilter.cs" />
+    <Compile Include="HotkeyRegistrar.cs" />
     <Compile Include="NoPresetPresetContextMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -60,16 +69,27 @@
     <Compile Include="PresetContextMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UseAppliedPresetCountdownForm.cs">
+    <Compile Include="Forms\PresetHotkeyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UseAppliedPresetCountdownForm.Designer.cs">
-      <DependentUpon>UseAppliedPresetCountdownForm.cs</DependentUpon>
+    <Compile Include="Forms\PresetHotkeyForm.Designer.cs">
+      <DependentUpon>PresetHotkeyForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="EnterNewPresetNameForm.resx">
+    <Compile Include="PresetHotkeyPersistencePair.cs" />
+    <Compile Include="PresetToHotkeyMap.cs" />
+    <Compile Include="PresetToHotkeyMapPersistence.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SafePresetApplier.cs" />
+    <Compile Include="VirtualHotkey.cs" />
+    <EmbeddedResource Include="Forms\EnterNewPresetNameForm.resx">
       <DependentUpon>EnterNewPresetNameForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PresetHotkeyForm.resx">
+      <DependentUpon>PresetHotkeyForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UseAppliedPresetCountdownForm.resx">
+      <DependentUpon>UseAppliedPresetCountdownForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -81,9 +101,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="UseAppliedPresetCountdownForm.resx">
-      <DependentUpon>UseAppliedPresetCountdownForm.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -101,6 +118,10 @@
     <ProjectReference Include="..\OutputSwitcherCore\OutputSwitcherCore.csproj">
       <Project>{164c2b8b-51af-4b05-bdff-6341e8b00f92}</Project>
       <Name>OutputSwitcherCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OutputSwitcherWinAPI\OutputSwitcherWinAPI.csproj">
+      <Project>{ef8afdd0-0f6d-406d-a184-433e2dda28b7}</Project>
+      <Name>OutputSwitcherWinAPI</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
