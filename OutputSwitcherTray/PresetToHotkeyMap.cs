@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OutputSwitcher.Core;
 
 namespace OutputSwitcher.TrayApp
 {
@@ -78,11 +79,31 @@ namespace OutputSwitcher.TrayApp
             PresetToHotkeyMapPersistence.SavePresetToHotkeysMap(mPresetToHotkeyDictionary);
         }
 
+        /// <summary>
+        /// Handles the event when the display preset collection has changed. If a preset has been
+        /// deleted, the corresponding hotkey (if existing) should be deleted as well.
+        /// </summary>
+        /// <param name="changeType">The type of collection change.</param>
+        /// <param name="presetName">The name of the changed preset.</param>
+        private void OnDisplayPresetCollectionChanged(DisplayPresetCollection.DisplayPresetCollectionChangeType changeType, string presetName)
+        {
+            // Really it seems a better idea to just unify all the persistence into one data structure and
+            // collection rather than trying to keep two collections in sync.
+
+            if (changeType == DisplayPresetCollection.DisplayPresetCollectionChangeType.PresetRemoved && 
+                mPresetToHotkeyDictionary.ContainsKey(presetName))
+            {
+                RemoveHotkey(presetName);
+            }
+        }
+
         private PresetToHotkeyMap()
         {
             Dictionary<string, VirtualHotkey> dictionary = PresetToHotkeyMapPersistence.LoadPresetToHotkeysMap();
 
             mPresetToHotkeyDictionary = dictionary != null ? new Dictionary<string, VirtualHotkey>(dictionary) : new Dictionary<string, VirtualHotkey>();
+
+            DisplayPresetCollection.GetDisplayPresetCollection().DisplayPresetCollectionChanged += OnDisplayPresetCollectionChanged;
         }
 
         private static PresetToHotkeyMap mInstance;
